@@ -3,19 +3,19 @@
 ## Active Tasks
 
 ### TS-4: Create AR plane detection and visualization
-**Status:** In Progress
-**Branch:** `TS-AR-plane-detection`
+**Status:** Partially Complete, Merged to Dev
+**Branch:** `dev` (merged from `TS-AR-plane-detection`)
 **Completed:**
 - [x] Create ARSessionManager script
 - [x] Create ARPlaneController script
 - [x] Create AR plane material
 - [x] Implement plane detection logic
 - [x] Add visual feedback for different plane types
+- [x] Merge core functionality to dev branch
 **Remaining:**
-- [ ] Create and configure plane visualization prefab
+- [ ] Create and configure plane visualization prefab in Unity Editor
 - [ ] Test plane detection on device
-- [ ] Create pull request for dev branch
-- [ ] Update documentation
+- [ ] Update documentation with AR setup instructions
 
 ### TS-6: Import avatar model and configure import settings
 **Status:** In Progress
