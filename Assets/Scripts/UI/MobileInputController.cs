@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using TequilaSunrise.UI.Utilities;
 
 namespace TequilaSunrise.UI
 {
@@ -503,9 +504,10 @@ namespace TequilaSunrise.UI
                 
                 // Animate opacity change
                 float targetOpacity = shouldBeVisible ? controlOpacity : idleOpacity;
-                LeanTween.cancel(_canvasGroup.gameObject);
-                LeanTween.alphaCanvas(_canvasGroup, targetOpacity, fadeDuration)
-                    .setEase(LeanTweenType.easeInOutQuad);
+                
+                // Use TweenUtility instead of LeanTween
+                TweenUtility.Cancel(_canvasGroup.gameObject);
+                TweenUtility.FadeCanvasGroup(this, _canvasGroup, targetOpacity, fadeDuration, TweenUtility.EaseType.EaseInOut);
             }
         }
         
@@ -542,22 +544,22 @@ namespace TequilaSunrise.UI
         {
             if (_canvasGroup == null) return;
             
-            LeanTween.cancel(_canvasGroup.gameObject);
+            // Use TweenUtility instead of LeanTween
+            TweenUtility.Cancel(_canvasGroup.gameObject);
+            
             if (visible)
             {
-                LeanTween.alphaCanvas(_canvasGroup, controlOpacity, fadeDuration)
-                    .setEase(LeanTweenType.easeInOutQuad);
+                var tween = TweenUtility.FadeCanvasGroup(this, _canvasGroup, controlOpacity, fadeDuration, TweenUtility.EaseType.EaseInOut);
                 _canvasGroup.blocksRaycasts = true;
                 _canvasGroup.interactable = true;
             }
             else
             {
-                LeanTween.alphaCanvas(_canvasGroup, 0f, fadeDuration)
-                    .setEase(LeanTweenType.easeInOutQuad)
-                    .setOnComplete(() => {
-                        _canvasGroup.blocksRaycasts = false;
-                        _canvasGroup.interactable = false;
-                    });
+                var tween = TweenUtility.FadeCanvasGroup(this, _canvasGroup, 0f, fadeDuration, TweenUtility.EaseType.EaseInOut);
+                TweenUtility.SetOnComplete(this, tween, () => {
+                    _canvasGroup.blocksRaycasts = false;
+                    _canvasGroup.interactable = false;
+                });
             }
         }
         

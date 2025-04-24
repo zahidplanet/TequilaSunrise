@@ -1,0 +1,31 @@
+name: Issue Tracker
+
+on:
+  issues:
+    types: [opened, edited, deleted, closed, reopened, labeled, unlabeled, assigned, unassigned]
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  track_issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Update Issue Status
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const script = require('./.github/scripts/update-issue-status.js')
+            await script({github, context})
+        if: github.event_name == 'issues'
+      
+      - name: Update PR Status
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const script = require('./.github/scripts/update-pr-status.js')
+            await script({github, context})
+        if: github.event_name == 'pull_request' 

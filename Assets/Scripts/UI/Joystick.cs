@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TequilaSunrise.UI.Utilities;
 
 namespace TequilaSunrise.UI
 {
@@ -280,9 +281,11 @@ namespace TequilaSunrise.UI
             if (scaleOnPress)
             {
                 float targetScale = active ? pressedScale : releaseScale;
-                LeanTween.cancel(gameObject);
-                LeanTween.scale(gameObject, _defaultScale * targetScale, scaleDuration)
-                    .setEase(active ? LeanTweenType.easeOutBack : LeanTweenType.easeInSine);
+                
+                // Use TweenUtility instead of LeanTween
+                TweenUtility.Cancel(gameObject);
+                TweenUtility.Scale(this, gameObject, _defaultScale * targetScale, scaleDuration, 
+                    active ? TweenUtility.EaseType.Spring : TweenUtility.EaseType.EaseIn);
             }
         }
         

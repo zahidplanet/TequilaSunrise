@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using TequilaSunrise.UI.Utilities;
 
 namespace TequilaSunrise.UI
 {
@@ -67,10 +68,11 @@ namespace TequilaSunrise.UI
         private bool _interactable = true;
         
         // Properties
-        public string ActionName => actionName;
+        public string ButtonId => actionName;
         public bool IsPressed => _isPressed;
         public bool IsToggled => _isToggled;
         public bool IsInteractable => _interactable;
+        public bool IsHolding => _isHolding;
         
         private void Awake()
         {
