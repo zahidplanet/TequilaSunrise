@@ -18,6 +18,7 @@ This document serves as the central place for tracking tasks that need to be imp
 
 | ID    | Title | Description | Priority | Assignee | Status |
 |-------|-------|-------------|----------|----------|--------|
+| TS-4  | Create AR plane detection and visualization | Implement plane detection with visual indicators | High | @zahidplanet | In Progress |
 | TS-6  | Import avatar model and configure import settings | Import and set up the TS_PixelAvatarMain model | High | @zahidplanet | In Progress |
 | TS-7  | Create avatar animation controller and transitions | Set up animation states and transitions | High | @zahidplanet | In Progress |
 
@@ -26,10 +27,10 @@ This document serves as the central place for tracking tasks that need to be imp
 | ID    | Title | Description | Priority | Status |
 |-------|-------|-------------|----------|--------|
 | TS-1  | Initialize repository setup and documentation | Set up GitHub repo with proper documentation and workflow | High | Done |
-| TS-2  | Configure Unity project with AR Foundation | Set up Unity project with AR Foundation and URP | High | Ready |
-| TS-3  | Implement AR session and camera setup | Configure AR camera and session settings | High | Backlog |
-| TS-4  | Create AR plane detection and visualization | Implement plane detection with visual indicators | Medium | Backlog |
-| TS-5  | Set up mobile build configurations | Configure build settings for iOS and Android | Medium | Backlog |
+| TS-2  | Configure Unity project with AR Foundation | Set up Unity project with AR Foundation and URP | High | Done |
+| TS-3  | Implement AR session and camera setup | Configure AR camera and session settings | High | Done |
+| TS-4  | Create AR plane detection and visualization | Implement plane detection with visual indicators | High | In Progress |
+| TS-5  | Set up mobile build configurations | Configure build settings for iOS and Android | Medium | Ready |
 
 ## Milestone 2: Avatar Implementation
 
