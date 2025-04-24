@@ -7,147 +7,118 @@ namespace TequilaSunrise.Avatar
     [RequireComponent(typeof(CharacterController))]
     public class AvatarController : MonoBehaviour
     {
+        [Header("Movement Settings")]
+        [SerializeField] private float moveSpeed = 5f;
+        [SerializeField] private float sprintSpeedMultiplier = 1.5f;
+        [SerializeField] private float jumpForce = 5f;
+        [SerializeField] private float gravity = -9.81f;
+        [SerializeField] private float rotationSpeed = 10f;
+
         [Header("References")]
+        [SerializeField] private MobileInputController inputController;
         [SerializeField] private Animator animator;
+        [SerializeField] private Transform cameraTransform;
         [SerializeField] private CharacterController characterController;
         [SerializeField] private ARPlaneManager planeManager;
         
-        [Header("Movement Settings")]
-        [SerializeField] private float walkSpeed = 2.0f;
-        [SerializeField] private float sprintSpeed = 4.0f;
-        [SerializeField] private float acceleration = 10.0f;
-        [SerializeField] private float deceleration = 15.0f;
-        [SerializeField] private float rotationSpeed = 10.0f;
-        [SerializeField] private float airControlFactor = 0.5f;
-        
-        [Header("Jump Settings")]
-        [SerializeField] private float jumpForce = 5.0f;
-        [SerializeField] private float gravity = -9.81f;
-        [SerializeField] private float groundCheckRadius = 0.3f;
-        [SerializeField] private LayerMask groundLayers;
-        
         [Header("Mobile Controls")]
-        [SerializeField] private Joystick _joystick;
+        [SerializeField] private Joystick joystickInput;
         
-        // Public property for the joystick
-        public Joystick joystick {
-            get { return _joystick; }
-            set { _joystick = value; }
-        }
-        
-        private int animIDSpeed;
-        private int animIDGrounded;
-        private int animIDJump;
-        private int animIDSprint;
-        
-        private Vector3 moveDirection;
-        private Vector3 currentVelocity;
-        private float verticalVelocity;
-        private float currentSpeed;
-        private bool isJumping;
+        private Vector3 velocity;
         private bool isGrounded;
         private bool isSprinting;
+        private static readonly int SpeedHash = Animator.StringToHash("Speed");
+        private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
         
-        private void Start()
+        public Joystick Joystick
+        {
+            get => joystickInput;
+            set => joystickInput = value;
+        }
+        
+        private void Awake()
         {
             if (animator == null) animator = GetComponent<Animator>();
             if (characterController == null) characterController = GetComponent<CharacterController>();
             
-            animIDSpeed = Animator.StringToHash("Speed");
-            animIDGrounded = Animator.StringToHash("Grounded");
-            animIDJump = Animator.StringToHash("Jump");
-            animIDSprint = Animator.StringToHash("Sprint");
-            
-            currentSpeed = walkSpeed;
+            if (inputController != null)
+            {
+                inputController.OnJumpPressed.AddListener(OnJump);
+                inputController.OnSprintPressed.AddListener(() => isSprinting = true);
+                inputController.OnSprintReleased.AddListener(() => isSprinting = false);
+            }
+        }
+        
+        private void OnDestroy()
+        {
+            if (inputController != null)
+            {
+                inputController.OnJumpPressed.RemoveListener(OnJump);
+                inputController.OnSprintPressed.RemoveListener(() => isSprinting = true);
+                inputController.OnSprintReleased.RemoveListener(() => isSprinting = false);
+            }
         }
         
         private void Update()
         {
-            CheckGrounded();
             HandleMovement();
-            HandleGravity();
             UpdateAnimator();
-        }
-        
-        private void CheckGrounded()
-        {
-            RaycastHit hit;
-            Vector3 spherePosition = transform.position + Vector3.up * characterController.radius;
-            isGrounded = Physics.SphereCast(spherePosition, groundCheckRadius, Vector3.down, out hit, 
-                characterController.radius + 0.1f, groundLayers);
         }
         
         private void HandleMovement()
         {
-            float horizontal = _joystick.Horizontal;
-            float vertical = _joystick.Vertical;
-            Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
+            isGrounded = characterController.isGrounded;
             
-            if (direction.magnitude >= 0.1f)
+            if (isGrounded && velocity.y < 0)
             {
-                float targetSpeed = isSprinting ? sprintSpeed : walkSpeed;
-                currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * acceleration);
-                
-                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-                float angle = Mathf.LerpAngle(transform.eulerAngles.y, targetAngle, Time.deltaTime * rotationSpeed);
-                transform.rotation = Quaternion.Euler(0, angle, 0);
-                
-                moveDirection = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
-                if (!isGrounded) moveDirection *= airControlFactor;
-                
-                Vector3 targetVelocity = moveDirection * currentSpeed;
-                currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, Time.deltaTime * acceleration);
+                velocity.y = -2f;
             }
-            else
+
+            Vector2 input = inputController != null ? inputController.GetMovementInput() : Vector2.zero;
+            Vector3 move = new Vector3(input.x, 0, input.y);
+
+            if (cameraTransform != null)
             {
-                currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, Time.deltaTime * deceleration);
-                currentSpeed = 0;
+                move = cameraTransform.forward * move.z + cameraTransform.right * move.x;
+                move.y = 0f;
             }
-            
-            characterController.Move(currentVelocity * Time.deltaTime);
-        }
-        
-        private void HandleGravity()
-        {
-            if (isGrounded && verticalVelocity < 0)
+
+            if (move != Vector3.zero)
             {
-                verticalVelocity = -2f;
-                isJumping = false;
+                float currentSpeed = moveSpeed * (isSprinting ? sprintSpeedMultiplier : 1f);
+                characterController.Move(move * (currentSpeed * Time.deltaTime));
+
+                Quaternion targetRotation = Quaternion.LookRotation(move);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
-            
-            verticalVelocity += gravity * Time.deltaTime;
-            characterController.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
-        }
-        
-        public void Jump()
-        {
-            if (isGrounded && !isJumping)
-            {
-                verticalVelocity = Mathf.Sqrt(jumpForce * -2f * gravity);
-                isJumping = true;
-                animator.SetTrigger(animIDJump);
-            }
-        }
-        
-        public void ToggleSprint(bool sprinting)
-        {
-            isSprinting = sprinting;
+
+            velocity.y += gravity * Time.deltaTime;
+            characterController.Move(velocity * Time.deltaTime);
         }
         
         private void UpdateAnimator()
         {
-            float normalizedSpeed = currentVelocity.magnitude / sprintSpeed;
-            animator.SetFloat(animIDSpeed, normalizedSpeed);
-            animator.SetBool(animIDGrounded, isGrounded);
-            animator.SetBool(animIDSprint, isSprinting);
+            if (animator != null)
+            {
+                Vector2 input = inputController != null ? inputController.GetMovementInput() : Vector2.zero;
+                float speed = input.magnitude * (isSprinting ? sprintSpeedMultiplier : 1f);
+                animator.SetFloat(SpeedHash, speed);
+                animator.SetBool(IsGroundedHash, isGrounded);
+            }
+        }
+        
+        private void OnJump()
+        {
+            if (isGrounded)
+            {
+                velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+            }
         }
         
         public void OnMotorcycleMount(Transform motorcycleTransform)
         {
             characterController.enabled = false;
-            currentVelocity = Vector3.zero;
-            verticalVelocity = 0f;
-            isJumping = false;
+            velocity = Vector3.zero;
             isSprinting = false;
             
             transform.SetParent(motorcycleTransform);
@@ -159,8 +130,7 @@ namespace TequilaSunrise.Avatar
         {
             transform.SetParent(null);
             characterController.enabled = true;
-            currentVelocity = Vector3.zero;
-            currentSpeed = walkSpeed;
+            velocity = Vector3.zero;
         }
     }
 }
