@@ -1,0 +1,57 @@
+name: Feature Task
+description: Create a new feature task with TS prefix
+title: "TS-[number]-[brief-title]"
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for creating a feature task! Please follow the format TS-[number]-[brief-title]
+        Example: TS-13-implement-avatar-animations
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Detailed description of the feature
+      placeholder: "Implement avatar animations system including idle, walk, run states..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List the requirements that must be met
+      placeholder: |
+        - [ ] Animation controller created
+        - [ ] Basic state machine implemented
+        - [ ] Transitions working correctly
+        - [ ] Performance tested (60+ FPS)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Technical Notes
+      description: Any technical considerations or implementation details
+      placeholder: "Using Animator Controller with blend trees for smooth transitions..."
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies on other tasks
+      placeholder: "Requires TS-12 (Avatar Model Import) to be completed first" 

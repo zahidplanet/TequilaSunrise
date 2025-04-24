@@ -1,92 +1,169 @@
-# Tequila Sunrise
+# Tequila Sunrise 🏍️
 
-A Unity AR project that lets users control a pixel avatar and interact with a motorcycle in augmented reality.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![Unity](https://img.shields.io/badge/Unity-2022.3%20LTS-blue.svg)]()
+[![License](https://img.shields.io/badge/license-MIT-green.svg)]()
+[![AR Foundation](https://img.shields.io/badge/AR%20Foundation-5.0-purple.svg)]()
 
-## Description
+An innovative AR mobile experience combining retro pixel art aesthetics with modern augmented reality technology. Place and customize motorcycles in your real environment, capture stunning photos, and share your creations with the world.
 
-Tequila Sunrise is an AR mobile application built with Unity. It allows users to place a pixel-style avatar in AR environments, control its movement, and interact with a motorcycle that spawns on flat surfaces. The project is set up with Justin Barnett's Unity MCP package, allowing Claude to interact with Unity directly.
+## 🌟 Features
 
-## Features
+- **Immersive AR Experience**: Place and interact with pixel art motorcycles in your real environment
+- **Stunning Visuals**: Unique blend of retro pixel art and modern lighting effects
+- **Physics-Based Movement**: Realistic motorcycle physics and controls
+- **Deep Customization**: Extensive motorcycle and character customization options
+- **Photo Mode**: Capture and share your creations with advanced camera controls
+- **Social Integration**: Share your experiences and connect with other riders
 
-- AR surface detection and mapping
-- Pixel avatar with mobile controls (joystick, jump button)
-- Physically accurate motorcycle simulation
-- Mounting/dismounting interaction between avatar and motorcycle
-- One motorcycle spawns per scene on suitable flat surfaces
+## 🚀 Getting Started
 
-## Setup
+### Prerequisites
 
-The project includes:
-- Unity project with Universal Render Pipeline
-- Unity MCP integration for AI assistance
-- XR capabilities with ARKit, ARCore, and XR Interaction Toolkit
-- Complete project management and workflow documentation
+- Unity 2022.3 LTS
+- Xcode 15+ (for iOS development)
+- Git LFS
+- AR-capable iOS device (iPhone X or newer)
 
-## Requirements
+### Installation
 
-- Unity Editor 2022.3 LTS or newer
-- Compatible AR device (iOS with ARKit or Android with ARCore)
-- Claude Desktop (with MCP configured) for AI assistance
-
-## Project Structure
-
-- **Assets/**: Unity project assets
-  - **Models/**: 3D models including avatar and motorcycle
-  - **Scripts/**: C# scripts organized by feature
-  - **Prefabs/**: Reusable game objects
-  - **Scenes/**: Unity scenes
-  
-- **Documentation/**:
-  - [Project Roadmap](PROJECT_ROADMAP.md): Milestones and task breakdowns
-  - [Development Style Guide](DEVELOPMENT_STYLE_GUIDE.md): Coding standards and best practices
-  - [Workflow Guide](WORKFLOW.md): Git branching strategy and issue management
-
-## Development Workflow
-
-This project follows a structured development workflow:
-
-1. Tasks are tracked as GitHub issues with the format `TS-<number>`
-2. Feature branches are created following the pattern `TS-<number>-<description>`
-3. Completed features are merged into the `dev` branch
-4. Stable releases are merged from `dev` to `main`
-
-See [WORKFLOW.md](WORKFLOW.md) for detailed instructions on the development process.
-
-## GitHub Issue Management
-
-The repository includes a Python script to automate the creation of GitHub issues from the BACKLOG.md file:
-
+1. Clone the repository:
 ```bash
-# Run the script to create all issues
-python3 create_github_issues.py
-
-# Run in debug mode (only creates a few issues for testing)
-python3 create_github_issues.py --debug
-
-# Run in dry-run mode (shows what would be created without making changes)
-python3 create_github_issues.py --dry-run
+git clone https://github.com/yourusername/TequilaSunrise.git
+git lfs pull
 ```
 
-This script:
-1. Creates appropriate labels for milestones, priorities, and statuses
-2. Creates milestones for each project phase
-3. Creates GitHub issues for each task in the BACKLOG.md file
-4. Assigns appropriate labels to each issue
+2. Open the project in Unity 2022.3 LTS
 
-You need the GitHub CLI (`gh`) installed and authenticated to use this script.
+3. Install required packages:
+- AR Foundation 5.0
+- Universal Render Pipeline
+- TextMeshPro
+- Input System
 
-## Getting Started
+4. Open the ARTest scene in `Assets/Scenes/ARTest.unity`
 
-1. Clone the repository
-2. Open the project in Unity
-3. Import the required models from the Models folder
-4. Follow the setup instructions in Assets/Scripts/PrefabSetup.md
-5. Build to your AR-capable device
+### Building for iOS
 
-## Contributing
+1. Open Build Settings (File > Build Settings)
+2. Switch platform to iOS
+3. Configure Player Settings:
+   - Set Bundle Identifier
+   - Configure signing
+   - Enable required capabilities
+4. Build and Run
 
-Please read [WORKFLOW.md](WORKFLOW.md) and [DEVELOPMENT_STYLE_GUIDE.md](DEVELOPMENT_STYLE_GUIDE.md) before contributing to the project.
+## 📚 Documentation
 
-## License
+- [Technical Documentation](docs/technical/README.md)
+- [Design Style Guide](docs/design/style_guide.md)
+- [Development Workflow](docs/development/workflow.md)
+- [Project Roadmap](docs/project/roadmap.md)
+- [Monetization Strategy](docs/business/monetization.md)
+- [API Documentation](docs/api/README.md)
+- [Build Guide](docs/build/README.md)
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+## 🎮 Core Systems
+
+### AR Foundation Integration
+- AR Session management
+- Plane detection and tracking
+- Light estimation
+- Environment mapping
+
+### Motorcycle System
+- Physics-based movement
+- Customization system
+- Sound and effects
+- Input handling
+
+### UI/UX
+- Intuitive AR interface
+- Customization menus
+- Photo mode controls
+- Social features
+
+## 🛠️ Development
+
+### Branch Strategy
+- `main`: Production-ready code
+- `dev`: Development branch
+- `feature/*`: Feature branches
+- `bugfix/*`: Bug fix branches
+
+### Workflow
+1. Create feature branch from `dev`
+2. Implement changes
+3. Submit PR for review
+4. Merge to `dev` after approval
+5. Regular releases to `main`
+
+## 🧪 Testing
+
+### Unit Tests
+- Core systems
+- Physics calculations
+- Input handling
+- UI logic
+
+### Integration Tests
+- AR functionality
+- System interactions
+- Performance benchmarks
+
+### Manual Testing
+- AR experience
+- User interface
+- Device compatibility
+- Performance profiling
+
+## 📱 Supported Platforms
+
+### iOS
+- iPhone X or newer
+- iOS 14.0+
+- ARKit 4.0+
+- Metal graphics
+
+### Future Platforms
+- Android (planned)
+- iPad (planned)
+- AR Glasses (future)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to your branch
+5. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## 📈 Project Status
+
+- **Current Phase**: Foundation (Q1 2024)
+- **Latest Release**: v0.1.0-alpha
+- **Next Milestone**: Core Systems Implementation
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Unity Technologies
+- AR Foundation Team
+- Our amazing contributors
+- [List of third-party assets and tools]
+
+## 📞 Contact
+
+- Project Lead: [Name]
+- Email: [Email]
+- Twitter: [@handle]
+- Discord: [Server Link]
+
+---
+
+Made with ❤️ by the Tequila Sunrise Team 
