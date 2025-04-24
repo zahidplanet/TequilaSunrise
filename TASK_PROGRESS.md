@@ -9,15 +9,15 @@
 - [x] TS-5: Set up mobile build configurations
 
 ### In Progress
-- [ ] TS-3: Implement AR session and camera setup
+- [x] TS-3: Implement AR session and camera setup
   - Dependencies: TS-2 (Completed)
-  - Status: Ready to Start
+  - Status: Completed
   - Priority: High
   - Next Actions:
-    1. Initialize AR session management
-    2. Configure camera settings
-    3. Implement session state handling
-    4. Add device compatibility checks
+    1. Test AR session on device
+    2. Verify camera permissions
+    3. Document session state handling
+    4. Update compatibility documentation
 
 ## Next Sprint Planning (TS-M2: Avatar Implementation)
 - [ ] TS-6: Import avatar model and configure import settings
@@ -41,23 +41,23 @@
 ## Active Tasks
 
 ### TS-5: Set up mobile build configurations
-**Status:** In Progress
-**Branch:** `TS-5-mobile-build-config`
-**Tasks:**
-- [ ] iOS Build Setup:
-  - [ ] Configure build settings
-  - [ ] Set up required capabilities
-  - [ ] Configure AR permissions
-  - [ ] Test build pipeline
-- [ ] Android Build Setup:
-  - [ ] Configure build settings
-  - [ ] Set up required permissions
-  - [ ] Configure AR features
-  - [ ] Test build pipeline
-- [ ] Documentation:
-  - [ ] Document build process
-  - [ ] Add troubleshooting guide
-  - [ ] Create build checklist
+**Status:** Completed
+**Branch:** Merged to `dev`
+**Completed:**
+- [x] iOS Build Setup:
+  - [x] Configure build settings
+  - [x] Set up required capabilities
+  - [x] Configure AR permissions
+  - [x] Test build pipeline
+- [x] Android Build Setup:
+  - [x] Configure build settings
+  - [x] Set up required permissions
+  - [x] Configure AR features
+  - [x] Test build pipeline
+- [x] Documentation:
+  - [x] Document build process
+  - [x] Add troubleshooting guide
+  - [x] Create build checklist
 
 ### TS-6: Import avatar model and configure import settings
 **Status:** In Progress
