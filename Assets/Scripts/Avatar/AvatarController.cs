@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.XR.ARFoundation;
 
+[RequireComponent(typeof(CharacterController))]
 public class AvatarController : MonoBehaviour
 {
     [Header("References")]
@@ -12,141 +10,147 @@ public class AvatarController : MonoBehaviour
     [SerializeField] private ARPlaneManager planeManager;
     
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 2.0f;
+    [SerializeField] private float walkSpeed = 2.0f;
+    [SerializeField] private float sprintSpeed = 4.0f;
+    [SerializeField] private float acceleration = 10.0f;
+    [SerializeField] private float deceleration = 15.0f;
     [SerializeField] private float rotationSpeed = 10.0f;
+    [SerializeField] private float airControlFactor = 0.5f;
+    
+    [Header("Jump Settings")]
     [SerializeField] private float jumpForce = 5.0f;
     [SerializeField] private float gravity = -9.81f;
+    [SerializeField] private float groundCheckRadius = 0.3f;
+    [SerializeField] private LayerMask groundLayers;
     
     [Header("Mobile Controls")]
     [SerializeField] private Joystick joystick;
-    [SerializeField] private GameObject jumpButton;
     
-    // Animation parameters
     private int animIDSpeed;
     private int animIDGrounded;
     private int animIDJump;
+    private int animIDSprint;
     
-    // Movement variables
     private Vector3 moveDirection;
+    private Vector3 currentVelocity;
     private float verticalVelocity;
+    private float currentSpeed;
     private bool isJumping;
     private bool isGrounded;
-    
-    private void Awake()
-    {
-        // Get components if not assigned
-        if (animator == null)
-            animator = GetComponent<Animator>();
-        
-        if (characterController == null)
-            characterController = GetComponent<CharacterController>();
-    }
+    private bool isSprinting;
     
     private void Start()
     {
-        // Set up animation IDs
+        if (animator == null) animator = GetComponent<Animator>();
+        if (characterController == null) characterController = GetComponent<CharacterController>();
+        
         animIDSpeed = Animator.StringToHash("Speed");
         animIDGrounded = Animator.StringToHash("Grounded");
         animIDJump = Animator.StringToHash("Jump");
+        animIDSprint = Animator.StringToHash("Sprint");
+        
+        currentSpeed = walkSpeed;
     }
     
     private void Update()
     {
+        CheckGrounded();
         HandleMovement();
         HandleGravity();
         UpdateAnimator();
     }
     
+    private void CheckGrounded()
+    {
+        RaycastHit hit;
+        Vector3 spherePosition = transform.position + Vector3.up * characterController.radius;
+        isGrounded = Physics.SphereCast(spherePosition, groundCheckRadius, Vector3.down, out hit, 
+            characterController.radius + 0.1f, groundLayers);
+    }
+    
     private void HandleMovement()
     {
-        // Get joystick input
         float horizontal = joystick.Horizontal;
         float vertical = joystick.Vertical;
-        
-        // Calculate movement direction
         Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
         
         if (direction.magnitude >= 0.1f)
         {
-            // Calculate move amount
+            float targetSpeed = isSprinting ? sprintSpeed : walkSpeed;
+            currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * acceleration);
+            
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float currentAngle = Mathf.LerpAngle(transform.eulerAngles.y, targetAngle, Time.deltaTime * rotationSpeed);
+            float angle = Mathf.LerpAngle(transform.eulerAngles.y, targetAngle, Time.deltaTime * rotationSpeed);
+            transform.rotation = Quaternion.Euler(0, angle, 0);
             
-            // Rotate to face movement direction
-            transform.rotation = Quaternion.Euler(0, currentAngle, 0);
-            
-            // Apply movement
             moveDirection = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
-            characterController.Move(moveDirection.normalized * moveSpeed * Time.deltaTime);
+            if (!isGrounded) moveDirection *= airControlFactor;
+            
+            Vector3 targetVelocity = moveDirection * currentSpeed;
+            currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, Time.deltaTime * acceleration);
         }
         else
         {
-            moveDirection = Vector3.zero;
+            currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, Time.deltaTime * deceleration);
+            currentSpeed = 0;
         }
+        
+        characterController.Move(currentVelocity * Time.deltaTime);
     }
     
     private void HandleGravity()
     {
-        isGrounded = characterController.isGrounded;
-        
         if (isGrounded && verticalVelocity < 0)
         {
             verticalVelocity = -2f;
+            isJumping = false;
         }
         
-        // Apply gravity
         verticalVelocity += gravity * Time.deltaTime;
-        
-        // Move the character vertically
-        Vector3 verticalMove = new Vector3(0, verticalVelocity, 0) * Time.deltaTime;
-        characterController.Move(verticalMove);
+        characterController.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
     }
     
     public void Jump()
     {
-        if (isGrounded)
+        if (isGrounded && !isJumping)
         {
             verticalVelocity = Mathf.Sqrt(jumpForce * -2f * gravity);
             isJumping = true;
-            
-            // Trigger jump animation
             animator.SetTrigger(animIDJump);
         }
     }
     
+    public void ToggleSprint(bool sprinting)
+    {
+        isSprinting = sprinting;
+    }
+    
     private void UpdateAnimator()
     {
-        // Update animator parameters
-        float speed = moveDirection.magnitude * moveSpeed;
-        animator.SetFloat(animIDSpeed, speed);
+        float normalizedSpeed = currentVelocity.magnitude / sprintSpeed;
+        animator.SetFloat(animIDSpeed, normalizedSpeed);
         animator.SetBool(animIDGrounded, isGrounded);
+        animator.SetBool(animIDSprint, isSprinting);
     }
     
     public void OnMotorcycleMount(Transform motorcycleTransform)
     {
-        // Disable character controller when mounting the motorcycle
         characterController.enabled = false;
+        currentVelocity = Vector3.zero;
+        verticalVelocity = 0f;
+        isJumping = false;
+        isSprinting = false;
         
-        // Parent avatar to motorcycle
         transform.SetParent(motorcycleTransform);
-        
-        // Set position on the motorcycle seat
-        transform.localPosition = new Vector3(0, 0.5f, 0); // Adjust based on your motorcycle model
+        transform.localPosition = new Vector3(0, 0.5f, 0);
         transform.localRotation = Quaternion.identity;
-        
-        // Trigger mount animation (if you have one)
-        // animator.SetBool("IsRiding", true);
     }
     
     public void OnMotorcycleDismount()
     {
-        // Unparent from motorcycle
         transform.SetParent(null);
-        
-        // Re-enable character controller
         characterController.enabled = true;
-        
-        // Trigger dismount animation (if you have one)
-        // animator.SetBool("IsRiding", false);
+        currentVelocity = Vector3.zero;
+        currentSpeed = walkSpeed;
     }
-} 
+}
