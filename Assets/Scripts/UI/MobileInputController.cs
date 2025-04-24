@@ -92,10 +92,13 @@ namespace TequilaSunrise.UI
         [SerializeField] private float idleOpacity = 0.4f;
         [SerializeField] private GameObject controlsParent;
         
+        [Serializable]
+        public class StringEvent : UnityEvent<string> { }
+
         [Header("Events")]
-        public InputEvent OnButtonPressed;
-        public InputEvent OnButtonReleased;
-        public InputEvent OnButtonHeld;
+        public StringEvent OnButtonPressed;
+        public StringEvent OnButtonReleased;
+        public StringEvent OnButtonHeld;
         public UnityEvent<Vector2> OnMovementChanged;
         public UnityEvent<Vector2> OnLookChanged;
         
@@ -354,8 +357,8 @@ namespace TequilaSunrise.UI
             {
                 if (mapping.buttonId == buttonId && mapping.button != null)
                 {
-                    mapping.button.SimulateButtonPress();
-                    break;
+                    mapping.button.OnButtonDown.Invoke();
+                    return;
                 }
             }
         }
@@ -641,35 +644,6 @@ namespace TequilaSunrise.UI
         }
         
         /// <summary>
-        /// Simulates a button press programmatically
-        /// </summary>
-        public void SimulateButtonPress(string buttonId)
-        {
-            foreach (var button in actionButtons)
-            {
-                if (button != null && button.ButtonId == buttonId)
-                {
-                    button.Press();
-                    return;
-                }
-            }
-            
-            // Check specialized buttons
-            if (jumpButton != null && jumpButton.ButtonId == buttonId)
-            {
-                jumpButton.Press();
-            }
-            else if (interactButton != null && interactButton.ButtonId == buttonId)
-            {
-                interactButton.Press();
-            }
-            else if (sprintButton != null && sprintButton.ButtonId == buttonId)
-            {
-                sprintButton.Press();
-            }
-        }
-        
-        /// <summary>
         /// Reset all input states
         /// </summary>
         public void ResetAllInput()
@@ -684,6 +658,11 @@ namespace TequilaSunrise.UI
             {
                 _buttonStates[buttonId] = false;
                 _buttonHoldStates[buttonId] = false;
+            }
+            
+            foreach (var key in _joystickValues.Keys)
+            {
+                _joystickValues[key] = Vector2.zero;
             }
             
             OnMovementChanged?.Invoke(Vector2.zero);

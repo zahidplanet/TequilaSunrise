@@ -2,118 +2,152 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TequilaSunrise.Avatar;
 
-public class MotorcycleInteraction : MonoBehaviour
+namespace TequilaSunrise.Motorcycle
 {
-    [Header("References")]
-    [SerializeField] private AvatarController avatarController;
-    [SerializeField] private MotorcycleSpawner motorcycleSpawner;
-    [SerializeField] private Button interactButton;
-    [SerializeField] private Text interactButtonText;
-    
-    [Header("Interaction Settings")]
-    [SerializeField] private float interactionCheckInterval = 0.5f;
-    
-    private MotorcycleController currentMotorcycle;
-    private bool isRiding = false;
-    private float interactionTimer;
-    
-    private void Start()
+    public class MotorcycleInteraction : MonoBehaviour
     {
-        if (interactButton != null)
+        [Header("References")]
+        [SerializeField] private AvatarController avatarController;
+        [SerializeField] private MotorcycleSpawner motorcycleSpawner;
+        [SerializeField] private Button interactButton;
+        [SerializeField] private Text interactButtonText;
+        
+        [Header("Interaction Settings")]
+        [SerializeField] private float interactionCheckInterval = 0.5f;
+        
+        private MotorcycleController currentMotorcycle;
+        private bool isRiding = false;
+        private float interactionTimer;
+        
+        private void Start()
         {
-            interactButton.onClick.AddListener(HandleInteraction);
-            interactButton.gameObject.SetActive(false);
-        }
-    }
-    
-    private void Update()
-    {
-        interactionTimer += Time.deltaTime;
-        
-        if (interactionTimer >= interactionCheckInterval)
-        {
-            CheckForNearbyMotorcycle();
-            interactionTimer = 0f;
-        }
-    }
-    
-    private void CheckForNearbyMotorcycle()
-    {
-        // Get the current motorcycle from the spawner
-        GameObject motorcycleObj = motorcycleSpawner.GetSpawnedMotorcycle();
-        
-        if (motorcycleObj == null)
-            return;
-            
-        MotorcycleController motorcycle = motorcycleObj.GetComponent<MotorcycleController>();
-        
-        if (motorcycle == null)
-            return;
-            
-        // Check if we're close enough to interact
-        bool canInteract = motorcycle.CanInteractWith(avatarController.transform);
-        
-        if (canInteract)
-        {
-            // Show interaction button
             if (interactButton != null)
             {
-                interactButton.gameObject.SetActive(true);
+                interactButton.onClick.AddListener(HandleInteraction);
+                interactButton.gameObject.SetActive(false);
+            }
+        }
+        
+        private void Update()
+        {
+            interactionTimer += Time.deltaTime;
+            
+            if (interactionTimer >= interactionCheckInterval)
+            {
+                CheckForNearbyMotorcycle();
+                interactionTimer = 0f;
+            }
+        }
+        
+        private void CheckForNearbyMotorcycle()
+        {
+            // Get the current motorcycle from the spawner
+            GameObject motorcycleObj = motorcycleSpawner.GetSpawnedMotorcycle();
+            
+            if (motorcycleObj == null)
+                return;
                 
-                // Update text based on whether we're currently riding
-                if (isRiding)
+            MotorcycleController motorcycle = motorcycleObj.GetComponent<MotorcycleController>();
+            
+            if (motorcycle == null)
+                return;
+                
+            // Check if we're close enough to interact
+            bool canInteract = motorcycle.CanInteractWith(avatarController.transform);
+            
+            if (canInteract)
+            {
+                // Show interaction button
+                if (interactButton != null)
                 {
-                    interactButtonText.text = "Dismount";
+                    interactButton.gameObject.SetActive(true);
+                    
+                    // Update text based on whether we're currently riding
+                    if (isRiding)
+                    {
+                        interactButtonText.text = "Dismount";
+                    }
+                    else
+                    {
+                        interactButtonText.text = "Ride Motorcycle";
+                    }
                 }
-                else
+                
+                currentMotorcycle = motorcycle;
+            }
+            else
+            {
+                // Hide interaction button
+                if (interactButton != null)
+                {
+                    interactButton.gameObject.SetActive(false);
+                }
+                
+                currentMotorcycle = null;
+            }
+        }
+        
+        public void HandleInteraction()
+        {
+            if (currentMotorcycle == null)
+                return;
+                
+            if (isRiding)
+            {
+                // Dismount
+                currentMotorcycle.DismountRider();
+                isRiding = false;
+                
+                // Update button text
+                if (interactButtonText != null)
                 {
                     interactButtonText.text = "Ride Motorcycle";
                 }
             }
-            
-            currentMotorcycle = motorcycle;
-        }
-        else
-        {
-            // Hide interaction button
-            if (interactButton != null)
+            else
             {
-                interactButton.gameObject.SetActive(false);
+                // Mount
+                currentMotorcycle.MountRider(avatarController);
+                isRiding = true;
+                
+                // Update button text
+                if (interactButtonText != null)
+                {
+                    interactButtonText.text = "Dismount";
+                }
             }
-            
-            currentMotorcycle = null;
         }
     }
     
-    public void HandleInteraction()
+    public class MotorcycleController : MonoBehaviour
     {
-        if (currentMotorcycle == null)
-            return;
-            
-        if (isRiding)
+        // This is a stub class - actual implementation will be in a separate file
+        public bool CanInteractWith(Transform target) 
         {
-            // Dismount
-            currentMotorcycle.DismountRider();
-            isRiding = false;
-            
-            // Update button text
-            if (interactButtonText != null)
-            {
-                interactButtonText.text = "Ride Motorcycle";
-            }
+            // Implementation depends on the actual MotorcycleController
+            return true;
         }
-        else
+        
+        public void MountRider(AvatarController avatarController)
         {
-            // Mount
-            currentMotorcycle.MountRider(avatarController);
-            isRiding = true;
-            
-            // Update button text
-            if (interactButtonText != null)
-            {
-                interactButtonText.text = "Dismount";
-            }
+            // Implementation depends on the actual MotorcycleController
+        }
+        
+        public void DismountRider()
+        {
+            // Implementation depends on the actual MotorcycleController
+        }
+    }
+    
+    public class MotorcycleSpawner : MonoBehaviour
+    {
+        // This is a stub class - actual implementation will be in a separate file
+        public GameObject GetSpawnedMotorcycle()
+        {
+            // Implementation depends on the actual MotorcycleSpawner
+            return null;
         }
     }
 } 

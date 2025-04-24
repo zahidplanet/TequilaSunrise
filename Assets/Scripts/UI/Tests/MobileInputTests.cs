@@ -5,6 +5,8 @@ using UnityEngine.TestTools;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TequilaSunrise.UI;
+using UnityEngine.TestTools.Constraints;
+using Is = UnityEngine.TestTools.Constraints.Is;
 
 namespace TequilaSunrise.Tests
 {
