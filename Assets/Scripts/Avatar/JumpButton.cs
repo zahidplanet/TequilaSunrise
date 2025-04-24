@@ -4,15 +4,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class JumpButton : MonoBehaviour, IPointerDownHandler
+namespace TequilaSunrise.Avatar
 {
-    [SerializeField] private AvatarController avatarController;
-    
-    public void OnPointerDown(PointerEventData eventData)
+    public class JumpButton : MonoBehaviour, IPointerDownHandler
     {
-        if (avatarController != null)
+        [SerializeField] private AvatarController avatarController;
+        
+        public void OnPointerDown(PointerEventData eventData)
         {
-            avatarController.Jump();
+            if (avatarController != null)
+            {
+                avatarController.Jump();
+            }
         }
     }
 } 
