@@ -4,10 +4,49 @@
 
 ### Completed Tasks
 - [x] TS-1: Initialize repository setup and documentation
+  - [x] Repository structure
+  - [x] Documentation setup
+  - [x] Project guidelines
+  - [x] Issue templates
+
 - [x] TS-2: Configure Unity project with AR Foundation
+  - [x] AR Foundation package setup
+  - [x] XR Plugin Management configuration
+  - [x] URP configuration
+  - [x] Initial project structure
+
 - [x] TS-3: Implement AR session and camera setup
+  - [x] AR Session configuration
+  - [x] Camera setup and permissions
+  - [x] Session state handling
+  - [x] Basic AR functionality testing
+  - [x] Documentation updates
+
 - [x] TS-4: Create AR plane detection and visualization
+  - [x] Create ARSessionManager script
+  - [x] Create ARPlaneController script
+  - [x] Create AR plane material
+  - [x] Implement plane detection logic
+  - [x] Add visual feedback for different plane types
+  - [x] Create plane visualization prefab
+  - [x] Test plane detection functionality
+  - [x] Update documentation with AR setup instructions
+
 - [x] TS-5: Set up mobile build configurations
+  - [x] iOS Build Setup
+    - [x] Configure build settings
+    - [x] Set up required capabilities
+    - [x] Configure AR permissions
+    - [x] Test build pipeline
+  - [x] Android Build Setup
+    - [x] Configure build settings
+    - [x] Set up required permissions
+    - [x] Configure AR features
+    - [x] Test build pipeline
+  - [x] Documentation
+    - [x] Document build process
+    - [x] Add troubleshooting guide
+    - [x] Create build checklist
 
 ### Sprint TS-M1 Completion Status
 All tasks in Sprint TS-M1 are now complete. Key deliverables:
