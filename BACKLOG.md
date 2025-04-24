@@ -18,10 +18,10 @@ This document serves as the central place for tracking tasks that need to be imp
 
 | ID    | Title | Description | Priority | Assignee | Status |
 |-------|-------|-------------|----------|----------|--------|
-| TS-4  | Create AR plane detection and visualization | Implement plane detection with visual indicators | High | @zahidplanet | Partially Complete |
-| TS-5  | Set up mobile build configurations | Configure build settings for iOS and Android | Medium | @zahidplanet | Ready to Start |
-| TS-6  | Import avatar model and configure import settings | Import and set up the TS_PixelAvatarMain model | High | @zahidplanet | In Progress |
-| TS-7  | Create avatar animation controller and transitions | Set up animation states and transitions | High | @zahidplanet | In Progress |
+| TS-8  | Implement character controller with physics | Create character controller with collisions | High | @zahidplanet | Ready to Start |
+| TS-9  | Create mobile joystick control | Implement touchscreen joystick for movement | Medium | @zahidplanet | Backlog |
+| TS-10 | Implement jump button functionality | Create jump button and jumping physics | Medium | @zahidplanet | Backlog |
+| TS-11 | Create avatar placement in AR space | Allow user to place avatar on detected surfaces | High | @zahidplanet | Backlog |
 
 ## Milestone 1: Project Setup and Core AR Functionality
 
@@ -30,16 +30,16 @@ This document serves as the central place for tracking tasks that need to be imp
 | TS-1  | Initialize repository setup and documentation | Set up GitHub repo with proper documentation and workflow | High | Done |
 | TS-2  | Configure Unity project with AR Foundation | Set up Unity project with AR Foundation and URP | High | Done |
 | TS-3  | Implement AR session and camera setup | Configure AR camera and session settings | High | Done |
-| TS-4  | Create AR plane detection and visualization | Implement plane detection with visual indicators | High | Partially Complete |
-| TS-5  | Set up mobile build configurations | Configure build settings for iOS and Android | Medium | Ready to Start |
+| TS-4  | Create AR plane detection and visualization | Implement plane detection with visual indicators | High | Done |
+| TS-5  | Set up mobile build configurations | Configure build settings for iOS and Android | Medium | Done |
 
 ## Milestone 2: Avatar Implementation
 
 | ID    | Title | Description | Priority | Status |
 |-------|-------|-------------|----------|--------|
-| TS-6  | Import avatar model and configure import settings | Import and set up the TS_PixelAvatarMain model | High | In Progress |
-| TS-7  | Create avatar animation controller and transitions | Set up animation states and transitions | High | In Progress |
-| TS-8  | Implement character controller with physics | Create character controller with collisions | High | Backlog |
+| TS-6  | Import avatar model and configure import settings | Import and set up the TS_PixelAvatarMain model | High | Done |
+| TS-7  | Create avatar animation controller and transitions | Set up animation states and transitions | High | Done |
+| TS-8  | Implement character controller with physics | Create character controller with collisions | High | Ready to Start |
 | TS-9  | Create mobile joystick control | Implement touchscreen joystick for movement | Medium | Backlog |
 | TS-10 | Implement jump button functionality | Create jump button and jumping physics | Medium | Backlog |
 | TS-11 | Create avatar placement in AR space | Allow user to place avatar on detected surfaces | High | Backlog |
