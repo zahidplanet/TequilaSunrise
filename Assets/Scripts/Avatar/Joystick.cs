@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using TequilaSunrise.UI.Utilities;
 
 namespace TequilaSunrise.Avatar
 {

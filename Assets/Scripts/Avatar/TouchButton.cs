@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TequilaSunrise.UI.Utilities;
 
 namespace TequilaSunrise.Avatar
 {

@@ -79,6 +79,26 @@ namespace TequilaSunrise.UI.Utilities
         }
         
         /// <summary>
+        /// Move a RectTransform to a target position over time
+        /// </summary>
+        public static Coroutine MoveUI(MonoBehaviour owner, RectTransform rectTransform, Vector2 targetPosition, float duration, EaseType easing = EaseType.EaseOut)
+        {
+            if (rectTransform == null) return null;
+            
+            return owner.StartCoroutine(MoveUICoroutine(rectTransform, targetPosition, duration, easing));
+        }
+        
+        /// <summary>
+        /// Rotate an object over time
+        /// </summary>
+        public static Coroutine Rotate(MonoBehaviour owner, GameObject target, Vector3 targetRotation, float duration, EaseType easing = EaseType.EaseOut)
+        {
+            if (target == null) return null;
+            
+            return owner.StartCoroutine(RotateCoroutine(target, targetRotation, duration, easing));
+        }
+        
+        /// <summary>
         /// Cancel all tweens on a GameObject
         /// </summary>
         public static void Cancel(GameObject target)
@@ -164,6 +184,53 @@ namespace TequilaSunrise.UI.Utilities
             }
             
             graphic.color = targetColor;
+        }
+        
+        /// <summary>
+        /// Implementation of UI movement animation
+        /// </summary>
+        private static IEnumerator MoveUICoroutine(RectTransform rectTransform, Vector2 targetPosition, float duration, EaseType easing)
+        {
+            if (rectTransform == null) yield break;
+            
+            Vector2 startPosition = rectTransform.anchoredPosition;
+            float startTime = Time.time;
+            float endTime = startTime + duration;
+            
+            while (Time.time < endTime)
+            {
+                float normalizedTime = (Time.time - startTime) / duration;
+                float easedTime = GetEasedValue(normalizedTime, easing);
+                
+                rectTransform.anchoredPosition = Vector2.Lerp(startPosition, targetPosition, easedTime);
+                yield return null;
+            }
+            
+            rectTransform.anchoredPosition = targetPosition;
+        }
+        
+        /// <summary>
+        /// Implementation of rotation animation
+        /// </summary>
+        private static IEnumerator RotateCoroutine(GameObject target, Vector3 targetRotation, float duration, EaseType easing)
+        {
+            if (target == null) yield break;
+            
+            Quaternion startRotation = target.transform.rotation;
+            Quaternion endRotation = Quaternion.Euler(targetRotation);
+            float startTime = Time.time;
+            float endTime = startTime + duration;
+            
+            while (Time.time < endTime)
+            {
+                float normalizedTime = (Time.time - startTime) / duration;
+                float easedTime = GetEasedValue(normalizedTime, easing);
+                
+                target.transform.rotation = Quaternion.Slerp(startRotation, endRotation, easedTime);
+                yield return null;
+            }
+            
+            target.transform.rotation = endRotation;
         }
         
         /// <summary>
