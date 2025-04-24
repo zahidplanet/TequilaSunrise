@@ -1,32 +1,40 @@
 ---
-name: Feature request
-about: Suggest a new feature or enhancement for Tequila Sunrise
-title: "[TS-X] Feature title"
-labels: enhancement
+name: Feature Request
+about: Suggest a new feature for Tequila Sunrise
+title: '[FEATURE] '
+labels: type: feature
 assignees: ''
 ---
 
-## Description
-A clear and concise description of the feature you're proposing.
+## Feature Description
+<!-- A clear and concise description of the feature -->
 
-## Motivation
-Why is this feature needed? What value does it add to the project?
-
-## Proposed Implementation
-If you have ideas about how to implement this feature, describe them here.
+## User Story
+As a [type of user],
+I want [goal/desire]
+So that [benefit]
 
 ## Acceptance Criteria
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
 
-## Additional Context
-Add any other context, screenshots, or mockups about the feature request here.
+## Technical Requirements
+<!-- List any technical requirements or dependencies -->
+- [ ] Requirement 1
+- [ ] Requirement 2
 
-## Tasks
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
+## UI/UX Considerations
+<!-- Any UI/UX requirements or mockups -->
+
+## Performance Requirements
+<!-- Any specific performance requirements -->
+
+## Testing Requirements
+<!-- How should this feature be tested? -->
+
+## Additional Context
+<!-- Add any other context about the feature here -->
 
 ## Related Issues
-List any related issues here. 
+<!-- Link any related issues here --> 

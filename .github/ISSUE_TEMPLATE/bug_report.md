@@ -1,40 +1,41 @@
 ---
-name: Bug report
-about: Report a bug in Tequila Sunrise
-title: "[TS-X] Bug title"
-labels: bug
+name: Bug Report
+about: Create a report to help us improve Tequila Sunrise
+title: '[BUG] '
+labels: type: bug
 assignees: ''
 ---
 
-## Description
-A clear and concise description of the bug.
+## Bug Description
+<!-- A clear and concise description of what the bug is -->
 
-## Steps to Reproduce
+## Steps To Reproduce
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
 ## Expected Behavior
-A clear and concise description of what you expected to happen.
+<!-- A clear and concise description of what you expected to happen -->
 
 ## Actual Behavior
-What actually happened.
+<!-- What actually happened -->
 
 ## Screenshots/Videos
-If applicable, add screenshots or videos to help explain the problem.
+<!-- If applicable, add screenshots or videos to help explain your problem -->
 
 ## Environment
-- Device: [e.g. iPhone 12, Pixel 6]
-- OS: [e.g. iOS 15.4, Android 12]
-- Unity Version: [e.g. 2022.3.5f1]
+- Unity Version: [e.g. 2022.3 LTS]
+- Device: [e.g. iPhone 13]
+- OS: [e.g. iOS 15.0]
 - Build Version: [e.g. 1.0.0]
-
-## Possible Fix
-If you have suggestions on a fix for the bug, please describe.
+- AR Framework Version: [e.g. AR Foundation 5.0]
 
 ## Additional Context
-Add any other context about the problem here.
+<!-- Add any other context about the problem here -->
+
+## Possible Fix
+<!-- If you have suggestions on a fix for the bug -->
 
 ## Related Issues
-List any related issues here. 
+<!-- Link any related issues here --> 

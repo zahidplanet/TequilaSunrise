@@ -1,30 +1,32 @@
-# Pull Request
+## Description
+<!-- Describe your changes in detail -->
 
 ## Related Issue
-Closes #[issue-number]
-
-## Description
-<!-- Provide a summary of the changes in this PR -->
+<!-- Please link to the issue here -->
+Closes #[issue_number]
 
 ## Type of Change
-<!-- Mark the appropriate option with an 'x' -->
-- [ ] Bug fix (non-breaking change that fixes an issue)
-- [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
-- [ ] Documentation update
-- [ ] Code refactoring
+<!-- Please delete options that are not relevant -->
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Performance improvement
+- [ ] Code refactoring
+- [ ] Documentation update
+- [ ] Other (please describe)
 
-## How Has This Been Tested?
-<!-- Describe the tests that you ran to verify your changes -->
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] Manual tests
+## Testing Description
+<!-- Please describe the tests that you ran to verify your changes -->
+- [ ] Test A
+- [ ] Test B
 
-Describe the tests you ran to verify your changes:
+## Test Configuration
+<!-- Please describe the test configuration -->
+- Unity Version:
+- Device/Platform:
+- SDK Version:
 
 ## Checklist
-<!-- Mark the appropriate option with an 'x' -->
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
@@ -32,10 +34,10 @@ Describe the tests you ran to verify your changes:
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published
+- [ ] Any dependent changes have been merged and published in downstream modules
 
-## Screenshots (if applicable)
-<!-- Add screenshots or GIFs to help explain your changes -->
+## Screenshots/Videos
+<!-- If applicable, add screenshots or videos to help explain your changes -->
 
 ## Additional Notes
-<!-- Add any other notes about the PR here --> 
+<!-- Add any other context about the pull request here --> 
