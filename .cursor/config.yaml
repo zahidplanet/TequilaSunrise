@@ -1,0 +1,71 @@
+# ────────────────────────────────────────────────────────────────
+# Cursor Project Rules
+# Unity 2022 LTS • game-ci/unity-builder • MCP deploy
+# Branch Strategy: dev → main with TS-ID feature branches
+# ────────────────────────────────────────────────────────────────
+
+rules:
+  # 1️⃣  ISSUE → BRANCH
+  - id: triage-ts
+    trigger: issue_opened
+    if: "{{ issue.title | regex('^TS-[0-9]+-') }}"
+    actions:
+      - github.label: ["triaged", "task"]
+      - github.create_branch: "{{ issue.title | slug }}"
+      - github.comment: "🔧 Branch **{{ branch }}** created - happy coding!"
+
+  # 2️⃣  FIRST PUSH → PR
+  - id: auto-pr
+    trigger: push
+    if: "{{ branch.name | starts_with('TS-') }} && {{ push.commits == 1 }}"
+    actions:
+      - github.open_pr:
+          title: "{{ branch.name }}"
+          body: |
+            Closes #{{ issue.number }}
+            ### Checklist
+            - [ ] Game runs (Editor Play-Mode)
+            - [ ] EditMode & PlayMode tests green
+            - [ ] >60 FPS on reference device
+      - github.request_review: ["@dev-lead", "@qa"]
+
+  # 3️⃣  CI ON PR UPDATE
+  - id: unity-ci
+    trigger: pr_opened|pr_synchronized
+    actions:
+      - github.run_workflow: unity-ci.yml       # GitHub Action (game-ci/unity-builder)
+
+  # 4️⃣  MERGE GATE (all checks green)
+  - id: merge-gate
+    trigger: pr_checks_passed
+    if: "{{ pr.title | regex('^TS-[0-9]+-') }}"
+    actions:
+      - github.merge_pr: { method: squash }
+      - github.comment: "✅ Squash-merged into **dev**"
+
+  # 5️⃣  CLOSE LINKED ISSUE & LABEL DONE
+  - id: close-issue
+    trigger: pr_merged
+    if: "{{ pr.body | contains('Closes #') }}"
+    actions:
+      - github.close_issue: "{{ pr.body | extract('#(\\d+)') }}"
+      - github.label:
+          issue: "{{ pr.body | extract('#(\\d+)') }}"
+          value: ["done"]
+
+  # 6️⃣  TAG & RELEASE ON main
+  - id: tag-release
+    trigger: push
+    if: "{{ branch.name == 'main' }}"
+    actions:
+      - github.create_tag: "v{{ date.today | date_format('%Y.%m.%d') }}-{{ push.short_sha }}"
+      - github.release:
+          title: "Release {{ tag }}"
+          notes: "Automated build (CI)."
+
+  # 7️⃣  DEPLOY TO UNITY MCP
+  - id: mcp-deploy
+    trigger: release_published
+    actions:
+      - shell: >
+          unity-mcp deploy --build 'Builds/Android/{{ tag }}.apk' --track internal 
