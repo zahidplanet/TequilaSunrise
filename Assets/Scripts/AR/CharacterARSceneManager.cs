@@ -218,7 +218,7 @@ namespace TequilaSunrise.AR
             // Connect input controller to avatar if present
             if (_avatarController != null && inputController != null)
             {
-                connectInputToAvatar();
+                ConnectInputToAvatar();
             }
             
             // Enable motorcycle spawning
@@ -230,29 +230,37 @@ namespace TequilaSunrise.AR
             _sceneInitialized = true;
         }
         
-        private void connectInputToAvatar()
+        private void ConnectInputToAvatar()
         {
+            if (_avatarController == null || inputController == null)
+                return;
+
             // Set joystick references
             if (_avatarController.joystick == null)
             {
-                Joystick movementJoystick = inputController.GetComponentInChildren<Joystick>();
-                if (movementJoystick != null)
-                {
-                    _avatarController.joystick = movementJoystick;
-                }
+                _avatarController.joystick = inputController.Joystick;
             }
             
             // Set up button listeners
-            foreach (var button in inputController.GetComponentsInChildren<ActionButton>())
+            ActionButton[] buttons = inputController.GetComponentsInChildren<ActionButton>();
+            if (buttons != null)
             {
-                if (button.ButtonId == "jump")
+                foreach (var button in buttons)
                 {
-                    button.OnButtonDown.AddListener(_avatarController.Jump);
-                }
-                else if (button.ButtonId == "sprint")
-                {
-                    button.OnButtonDown.AddListener(() => _avatarController.ToggleSprint(true));
-                    button.OnButtonUp.AddListener(() => _avatarController.ToggleSprint(false));
+                    if (button == null) continue;
+                    
+                    string buttonId = button.ButtonId;
+                    if (string.IsNullOrEmpty(buttonId)) continue;
+
+                    if (buttonId.Equals("jump", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        button.OnPress.AddListener(_avatarController.Jump);
+                    }
+                    else if (buttonId.Equals("sprint", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        button.OnPress.AddListener(() => _avatarController.ToggleSprint(true));
+                        button.OnRelease.AddListener(() => _avatarController.ToggleSprint(false));
+                    }
                 }
             }
         }

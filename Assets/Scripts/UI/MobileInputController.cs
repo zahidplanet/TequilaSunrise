@@ -122,6 +122,15 @@ namespace TequilaSunrise.UI
         public bool IsSprinting { get; private set; }
         public bool IsInteracting { get; private set; }
 
+        public Joystick Joystick => movementJoystick;
+        public ActionButton JumpButton => jumpButton;
+        public ActionButton SprintButton => sprintButton;
+
+        public UnityEvent OnJumpPressed;
+        public UnityEvent OnJumpReleased;
+        public UnityEvent OnSprintPressed;
+        public UnityEvent OnSprintReleased;
+
         private void Awake()
         {
             _canvasGroup = GetComponent<CanvasGroup>();
@@ -146,6 +155,18 @@ namespace TequilaSunrise.UI
             else
             {
                 SetControlsVisible(mobileControlsEnabled);
+            }
+
+            if (jumpButton != null)
+            {
+                jumpButton.OnPress.AddListener(OnJumpButtonPressed);
+                jumpButton.OnRelease.AddListener(OnJumpButtonReleased);
+            }
+
+            if (sprintButton != null)
+            {
+                sprintButton.OnPress.AddListener(OnSprintButtonPressed);
+                sprintButton.OnRelease.AddListener(OnSprintButtonReleased);
             }
         }
 
@@ -670,5 +691,40 @@ namespace TequilaSunrise.UI
         }
         
         #endregion
+
+        private void OnJumpButtonPressed()
+        {
+            OnJumpPressed?.Invoke();
+        }
+
+        private void OnJumpButtonReleased()
+        {
+            OnJumpReleased?.Invoke();
+        }
+
+        private void OnSprintButtonPressed()
+        {
+            OnSprintPressed?.Invoke();
+        }
+
+        private void OnSprintButtonReleased()
+        {
+            OnSprintReleased?.Invoke();
+        }
+
+        private void OnDestroy()
+        {
+            if (jumpButton != null)
+            {
+                jumpButton.OnPress.RemoveListener(OnJumpButtonPressed);
+                jumpButton.OnRelease.RemoveListener(OnJumpButtonReleased);
+            }
+
+            if (sprintButton != null)
+            {
+                sprintButton.OnPress.RemoveListener(OnSprintButtonPressed);
+                sprintButton.OnRelease.RemoveListener(OnSprintButtonReleased);
+            }
+        }
     }
 } 

@@ -141,10 +141,6 @@ namespace TequilaSunrise.UI.Utilities
             float startTime = Time.time;
             float endTime = startTime + duration;
             
-            // Setup for callback if needed
-            bool useCallback = false;
-            Action onComplete = null;
-            
             while (Time.time < endTime)
             {
                 float normalizedTime = (Time.time - startTime) / duration;
@@ -155,12 +151,6 @@ namespace TequilaSunrise.UI.Utilities
             }
             
             canvasGroup.alpha = targetAlpha;
-            
-            // Execute callback if defined
-            if (useCallback && onComplete != null)
-            {
-                onComplete.Invoke();
-            }
         }
         
         /// <summary>
@@ -226,7 +216,7 @@ namespace TequilaSunrise.UI.Utilities
                 float normalizedTime = (Time.time - startTime) / duration;
                 float easedTime = GetEasedValue(normalizedTime, easing);
                 
-                target.transform.rotation = Quaternion.Slerp(startRotation, endRotation, easedTime);
+                target.transform.rotation = Quaternion.Lerp(startRotation, endRotation, easedTime);
                 yield return null;
             }
             
@@ -234,7 +224,7 @@ namespace TequilaSunrise.UI.Utilities
         }
         
         /// <summary>
-        /// Apply easing to a normalized value
+        /// Get eased value based on easing type
         /// </summary>
         private static float GetEasedValue(float t, EaseType easing)
         {
@@ -253,20 +243,17 @@ namespace TequilaSunrise.UI.Utilities
                     return t < 0.5f ? 2 * t * t : -1 + (4 - 2 * t) * t;
                     
                 case EaseType.Spring:
-                    return 1 - (Mathf.Cos(t * 4.5f * Mathf.PI) * Mathf.Exp(-t * 6));
+                    return 1 + (-Mathf.Pow(2.72f, -10 * t) * Mathf.Cos(10 * t));
                     
                 case EaseType.Bounce:
-                    float d1 = 2.75f;
-                    float n1 = 7.5625f;
-                    
-                    if (t < 1 / d1)
-                        return n1 * t * t;
-                    else if (t < 2 / d1)
-                        return n1 * (t -= 1.5f / d1) * t + 0.75f;
-                    else if (t < 2.5 / d1)
-                        return n1 * (t -= 2.25f / d1) * t + 0.9375f;
+                    if (t < 0.5f)
+                    {
+                        return 4 * t * t;
+                    }
                     else
-                        return n1 * (t -= 2.625f / d1) * t + 0.984375f;
+                    {
+                        return (2 * t - 1) * (2 * t - 1) * 0.5f + 0.5f;
+                    }
                     
                 default:
                     return t;
@@ -274,17 +261,16 @@ namespace TequilaSunrise.UI.Utilities
         }
         
         /// <summary>
-        /// Setup a tween to call a function on completion
+        /// Set a callback to be executed when a tween completes
         /// </summary>
         public static Coroutine SetOnComplete(MonoBehaviour owner, Coroutine tween, Action onComplete)
         {
             if (tween == null || onComplete == null) return null;
-            
             return owner.StartCoroutine(ExecuteAfterCoroutine(owner, tween, onComplete));
         }
         
         /// <summary>
-        /// Helper to execute a function after a coroutine completes
+        /// Execute a callback after a coroutine completes
         /// </summary>
         private static IEnumerator ExecuteAfterCoroutine(MonoBehaviour owner, Coroutine coroutine, Action onComplete)
         {

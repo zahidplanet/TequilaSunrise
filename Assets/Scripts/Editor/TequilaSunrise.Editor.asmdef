@@ -1,0 +1,24 @@
+{
+    "name": "TequilaSunrise.Editor",
+    "rootNamespace": "TequilaSunrise.Editor",
+    "references": [
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "Unity.XR.CoreUtils",
+        "TequilaSunrise.AR",
+        "TequilaSunrise.Avatar",
+        "TequilaSunrise.Motorcycle",
+        "TequilaSunrise.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+} 

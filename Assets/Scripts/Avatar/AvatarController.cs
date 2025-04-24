@@ -30,7 +30,7 @@ namespace TequilaSunrise.Avatar
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
         private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
         
-        public Joystick Joystick
+        public Joystick joystick
         {
             get => joystickInput;
             set => joystickInput = value;
@@ -113,6 +113,16 @@ namespace TequilaSunrise.Avatar
             {
                 velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
             }
+        }
+        
+        public void Jump()
+        {
+            OnJump();
+        }
+        
+        public void ToggleSprint(bool sprinting)
+        {
+            isSprinting = sprinting;
         }
         
         public void OnMotorcycleMount(Transform motorcycleTransform)

@@ -199,54 +199,49 @@ namespace TequilaSunrise.UI
             // If outside deadzone, normalize input
             if (_input.magnitude > deadZone)
             {
-                if (_input.magnitude > 1)
-                    _input = _input.normalized;
+                _input = _input.normalized * (((_input.magnitude - deadZone) / (1 - deadZone)));
             }
-            else
-                _input = Vector2.zero;
             
-            // Trigger event
+            // Trigger moved event
             OnJoystickMoved?.Invoke(Direction);
         }
 
         private float SnapAxis(float value)
         {
-            if (value > 0.5f)
-                return 1f;
-            if (value < -0.5f)
-                return -1f;
-            return 0f;
+            if (value > 0)
+                return 1;
+            if (value < 0)
+                return -1;
+            return 0;
         }
 
         private Vector2 GetLocalPointFrom(PointerEventData eventData)
         {
-            if (_canvas == null)
+            if (_canvas == null || _canvasRectTransform == null)
                 return Vector2.zero;
                 
             Vector2 localPoint;
+            
+            // Convert screen point to local point
             if (_canvas.renderMode == RenderMode.ScreenSpaceOverlay)
             {
-                // For overlay canvas, just use screen position
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    background,
-                    eventData.position,
-                    eventData.pressEventCamera,
-                    out localPoint);
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    background, eventData.position, null, out localPoint))
+                {
+                    return localPoint;
+                }
             }
-            else
+            else if (_canvas.renderMode == RenderMode.ScreenSpaceCamera || 
+                     _canvas.renderMode == RenderMode.WorldSpace)
             {
-                // For other canvas render modes, need to convert to world to local
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    _canvasRectTransform,
-                    eventData.position,
-                    eventData.pressEventCamera,
-                    out localPoint);
-                    
-                // Adjust for the container position
-                localPoint -= _rectTransform.anchoredPosition;
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    background, eventData.position, _canvas.worldCamera, out localPoint))
+                {
+                    return localPoint;
+                }
             }
             
-            return localPoint;
+            return Vector2.zero;
         }
 
         public void SetMoveThreshold(float threshold)
@@ -268,24 +263,24 @@ namespace TequilaSunrise.UI
         {
             if (fadeWhenReleased)
             {
-                Color bgColor = active ? activeColor : idleColor;
-                Color handleColor = active ? activeColor : idleColor;
+                float targetAlpha = active ? activeAlpha : idleAlpha;
+                Color targetColor = active ? activeColor : idleColor;
                 
                 if (backgroundImage != null)
-                    backgroundImage.color = bgColor;
-                    
+                {
+                    TweenUtility.ChangeGraphicColor(this, backgroundImage, targetColor, 0.2f);
+                }
+                
                 if (handleImage != null)
-                    handleImage.color = handleColor;
+                {
+                    TweenUtility.ChangeGraphicColor(this, handleImage, targetColor, 0.2f);
+                }
             }
             
             if (scaleOnPress)
             {
                 float targetScale = active ? pressedScale : releaseScale;
-                
-                // Use TweenUtility instead of LeanTween
-                TweenUtility.Cancel(gameObject);
-                TweenUtility.Scale(this, gameObject, _defaultScale * targetScale, scaleDuration, 
-                    active ? TweenUtility.EaseType.Spring : TweenUtility.EaseType.EaseIn);
+                TweenUtility.Scale(this, gameObject, _defaultScale * targetScale, scaleDuration);
             }
         }
         
@@ -299,18 +294,23 @@ namespace TequilaSunrise.UI
             _rectTransform.anchoredPosition = _initialPosition;
             _currentTargetPosition = _initialPosition;
             handle.anchoredPosition = Vector2.zero;
+            _input = Vector2.zero;
         }
         
         public void SetHandleColor(Color color)
         {
             if (handleImage != null)
+            {
                 handleImage.color = color;
+            }
         }
         
         public void SetBackgroundColor(Color color)
         {
             if (backgroundImage != null)
+            {
                 backgroundImage.color = color;
+            }
         }
     }
 } 

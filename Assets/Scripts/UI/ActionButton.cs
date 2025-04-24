@@ -56,6 +56,9 @@ namespace TequilaSunrise.UI
         public UnityEvent OnButtonHeld;
         public UnityEvent<bool> OnButtonToggled;
         
+        [SerializeField] private UnityEvent onPress;
+        [SerializeField] private UnityEvent onRelease;
+        
         // Private variables
         private Image _buttonImage;
         private Vector3 _initialScale;
@@ -73,6 +76,8 @@ namespace TequilaSunrise.UI
         public bool IsToggled => _isToggled;
         public bool IsInteractable => _interactable;
         public bool IsHolding => _isHolding;
+        public UnityEvent OnPress => onPress;
+        public UnityEvent OnRelease => onRelease;
         
         private void Awake()
         {

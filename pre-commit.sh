@@ -1,0 +1,1 @@
+.github/scripts/pre-commit.sh

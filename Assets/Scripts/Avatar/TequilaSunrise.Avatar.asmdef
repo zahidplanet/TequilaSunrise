@@ -1,0 +1,17 @@
+{
+    "name": "TequilaSunrise.Avatar",
+    "rootNamespace": "TequilaSunrise.Avatar",
+    "references": [
+        "Unity.InputSystem",
+        "Unity.XR.CoreUtils"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+} 
