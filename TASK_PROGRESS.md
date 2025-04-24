@@ -4,38 +4,39 @@
 
 ### Completed Tasks
 - [x] TS-1: Initialize repository setup and documentation
+- [x] TS-2: Configure Unity project with AR Foundation
 - [x] TS-4: Create AR plane detection and visualization
 - [x] TS-5: Set up mobile build configurations
 
 ### In Progress
-- [ ] TS-2: Configure Unity project with AR Foundation
-  - Branch: TS-2-ar-foundation-setup
-  - Status: In Progress
-  - Next Actions:
-    1. Install AR Foundation package
-    2. Configure project settings for AR
-    3. Set up basic AR scene template
-    4. Test AR Foundation initialization
-
-### Pending
 - [ ] TS-3: Implement AR session and camera setup
-  - Dependencies: TS-2
-  - Status: Pending
+  - Dependencies: TS-2 (Completed)
+  - Status: Ready to Start
   - Priority: High
+  - Next Actions:
+    1. Initialize AR session management
+    2. Configure camera settings
+    3. Implement session state handling
+    4. Add device compatibility checks
 
 ## Next Sprint Planning (TS-M2: Avatar Implementation)
 - [ ] TS-6: Import avatar model and configure import settings
+  - Branch: TS-6-import-avatar-model
+  - Status: In Progress
 - [ ] TS-7: Create avatar animation controller and transitions
 - [ ] TS-8: Implement character controller with physics
+  - Branch: TS-8-character-controller-physics
+  - Status: Ready to Start
 - [ ] TS-9: Create mobile joystick control
 - [ ] TS-10: Implement jump button functionality
 - [ ] TS-11: Create avatar placement in AR space
 - [ ] TS-12: Add avatar scaling and positioning
 
 ## Notes
-- AR Foundation setup is critical path for all AR features
+- AR Foundation setup is complete and merged to dev
 - Mobile build configuration is complete and tested
 - Documentation is up to date with latest changes
+- Next focus: AR session implementation and testing
 
 ## Active Tasks
 
