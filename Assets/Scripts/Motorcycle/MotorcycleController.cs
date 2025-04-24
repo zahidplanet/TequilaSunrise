@@ -102,7 +102,7 @@ public class MotorcycleController : MonoBehaviour
     private void ApplyMotorTorque()
     {
         // Calculate current speed in km/h
-        float speed = motorcycleRigidbody.velocity.magnitude * 3.6f; // Convert to km/h
+        float speed = motorcycleRigidbody.linearVelocity.magnitude * 3.6f; // Convert to km/h
         
         // Apply motor torque to rear wheel
         if (speed < maxSpeed)
@@ -137,7 +137,7 @@ public class MotorcycleController : MonoBehaviour
     private void ApplyLean()
     {
         // Calculate lean based on steering and speed
-        float speed = motorcycleRigidbody.velocity.magnitude;
+        float speed = motorcycleRigidbody.linearVelocity.magnitude;
         float targetLean = -steeringInput * leanAngle * (speed / maxSpeed);
         
         // Apply lean to motorcycle body
@@ -149,7 +149,7 @@ public class MotorcycleController : MonoBehaviour
     private void ApplyDownforce()
     {
         // Apply downforce to keep motorcycle grounded
-        motorcycleRigidbody.AddForce(-transform.up * downforce * motorcycleRigidbody.velocity.magnitude);
+        motorcycleRigidbody.AddForce(-transform.up * downforce * motorcycleRigidbody.linearVelocity.magnitude);
     }
     
     private void UpdateWheelMeshes()
