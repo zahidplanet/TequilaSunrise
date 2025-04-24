@@ -2,20 +2,24 @@
 
 ## Active Tasks
 
-### TS-4: Create AR plane detection and visualization
-**Status:** Partially Complete, Merged to Dev
-**Branch:** `dev` (merged from `TS-AR-plane-detection`)
-**Completed:**
-- [x] Create ARSessionManager script
-- [x] Create ARPlaneController script
-- [x] Create AR plane material
-- [x] Implement plane detection logic
-- [x] Add visual feedback for different plane types
-- [x] Merge core functionality to dev branch
-**Remaining:**
-- [ ] Create and configure plane visualization prefab in Unity Editor
-- [ ] Test plane detection on device
-- [ ] Update documentation with AR setup instructions
+### TS-5: Set up mobile build configurations
+**Status:** In Progress
+**Branch:** `TS-5-mobile-build-config`
+**Tasks:**
+- [ ] iOS Build Setup:
+  - [ ] Configure build settings
+  - [ ] Set up required capabilities
+  - [ ] Configure AR permissions
+  - [ ] Test build pipeline
+- [ ] Android Build Setup:
+  - [ ] Configure build settings
+  - [ ] Set up required permissions
+  - [ ] Configure AR features
+  - [ ] Test build pipeline
+- [ ] Documentation:
+  - [ ] Document build process
+  - [ ] Add troubleshooting guide
+  - [ ] Create build checklist
 
 ### TS-6: Import avatar model and configure import settings
 **Status:** In Progress
@@ -39,27 +43,22 @@
 - [ ] Configure transitions
 - [ ] Test animations in game context
 
-## Next Tasks
-
-### TS-5: Set up mobile build configurations
-**Priority:** Medium
-**Prerequisites:** TS-4
-**Requirements:**
-- Configure iOS build settings
-- Configure Android build settings
-- Test builds on both platforms
-- Document build process
-
-### TS-8: Implement character controller with physics
-**Priority:** High
-**Prerequisites:** TS-6, TS-7
-**Requirements:**
-- Create character controller component
-- Implement basic movement
-- Add physics interactions
-- Configure collision detection
-
 ## Recently Completed Tasks
+
+### TS-4: AR Plane Detection and Visualization
+**Status:** Core Functionality Complete
+**Branch:** Merged to `dev`
+**Completed:**
+- [x] Create ARSessionManager script
+- [x] Create ARPlaneController script
+- [x] Create AR plane material
+- [x] Implement plane detection logic
+- [x] Add visual feedback for different plane types
+- [x] Merge core functionality to dev branch
+**Remaining (To be completed in Unity Editor):**
+- [ ] Create and configure plane visualization prefab
+- [ ] Test plane detection on device
+- [ ] Update documentation with AR setup instructions
 
 ### TS-3: Implement AR session and camera setup
 **Completed Date:** [Current Date]
@@ -84,4 +83,23 @@
 - Repository initialization
 - Documentation setup
 - Workflow guidelines
-- Issue templates 
+- Issue templates
+
+## Next Tasks
+
+### TS-8: Implement character controller with physics
+**Priority:** High
+**Prerequisites:** TS-6, TS-7
+**Requirements:**
+- Create character controller component
+- Implement basic movement
+- Add physics interactions
+- Configure collision detection
+
+### TS-9: Create and configure plane visualization prefab in Unity Editor
+**Priority:** Medium
+**Prerequisites:** TS-4
+**Requirements:**
+- Create and configure plane visualization prefab in Unity Editor
+- Test plane detection on device
+- Update documentation with AR setup instructions 
