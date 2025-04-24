@@ -1,58 +1,225 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
-public class Joystick : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
+namespace TequilaSunrise.Avatar
 {
-    [SerializeField] private RectTransform background;
-    [SerializeField] private RectTransform handle;
-    [SerializeField] private float deadZone = 0.1f;
-    [SerializeField] private float range = 1f;
-
-    private Vector2 input = Vector2.zero;
-    private Canvas canvas;
-    private Camera cam;
-
-    public float Horizontal { get { return input.x; } }
-    public float Vertical { get { return input.y; } }
-    public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
-
-    void Start()
+    /// <summary>
+    /// Virtual joystick for mobile controls that provides position data for character movement or camera control
+    /// </summary>
+    public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
-        canvas = GetComponentInParent<Canvas>();
-        if (canvas == null)
-            Debug.LogError("The Joystick is not placed inside a canvas");
-
-        if (background == null)
-            background = transform as RectTransform;
-
-        cam = canvas.worldCamera;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        Vector2 position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
-        Vector2 radius = background.sizeDelta / 2;
-        input = (eventData.position - position) / (radius * canvas.scaleFactor);
+        [Header("Components")]
+        [SerializeField] private RectTransform backgroundRect;
+        [SerializeField] private RectTransform handleRect;
         
-        // Clamp input vector to circle with radius 1
-        if (input.magnitude > 1)
-            input = input.normalized;
-
-        // Move joystick handle
-        handle.anchoredPosition = input * radius * range;
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        OnDrag(eventData);
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        input = Vector2.zero;
-        handle.anchoredPosition = Vector2.zero;
+        [Header("Settings")]
+        [SerializeField] private float joystickRange = 50f;
+        [SerializeField] private bool fixedPosition = true;
+        [SerializeField] private bool snapToCenter = true;
+        [SerializeField] private bool hideOnRelease = false;
+        [Tooltip("Time to reset joystick to center after release")]
+        [SerializeField] private float resetSpeed = 5.0f;
+        
+        [Header("Visual Feedback")]
+        [SerializeField] private bool showVisualFeedback = true;
+        [SerializeField] private Color normalColor = Color.white;
+        [SerializeField] private Color activeColor = new Color(0.8f, 0.8f, 1.0f);
+        
+        [Header("Events")]
+        public UnityEvent OnJoystickDown;
+        public UnityEvent OnJoystickUp;
+        public UnityEvent<Vector2> OnJoystickMove;
+        
+        // Private variables
+        private Vector2 _inputVector = Vector2.zero;
+        private Vector2 _pointerDownPosition;
+        private bool _isDragging = false;
+        private Canvas _canvas;
+        private Camera _uiCamera;
+        private UnityEngine.UI.Image _backgroundImage;
+        private UnityEngine.UI.Image _handleImage;
+        
+        // Public accessors
+        public float Horizontal => _inputVector.x;
+        public float Vertical => _inputVector.y;
+        public Vector2 Direction => _inputVector;
+        public float Magnitude => _inputVector.magnitude;
+        public bool IsDragging => _isDragging;
+        
+        private void Awake()
+        {
+            _canvas = GetComponentInParent<Canvas>();
+            _backgroundImage = backgroundRect?.GetComponent<UnityEngine.UI.Image>();
+            _handleImage = handleRect?.GetComponent<UnityEngine.UI.Image>();
+            
+            // Get UI camera
+            if (_canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                _uiCamera = _canvas.worldCamera;
+            
+            // Validate required components
+            if (backgroundRect == null)
+                Debug.LogError("Background RectTransform is not assigned to Joystick");
+            
+            if (handleRect == null)
+                Debug.LogError("Handle RectTransform is not assigned to Joystick");
+        }
+        
+        private void Start()
+        {
+            _pointerDownPosition = backgroundRect.position;
+            UpdateVisuals(false);
+            
+            // Hide joystick initially if set to hide when not in use
+            if (hideOnRelease) 
+            {
+                SetJoystickVisibility(false);
+            }
+        }
+        
+        private void Update()
+        {
+            // Reset joystick position if not being used and snap to center is enabled
+            if (!_isDragging && snapToCenter && _inputVector.magnitude > 0.01f)
+            {
+                _inputVector = Vector2.Lerp(_inputVector, Vector2.zero, Time.deltaTime * resetSpeed);
+                UpdateHandlePosition();
+            }
+        }
+        
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            _isDragging = true;
+            
+            // If not fixed position, move joystick to pointer position
+            if (!fixedPosition)
+            {
+                backgroundRect.position = eventData.position;
+                _pointerDownPosition = eventData.position;
+            }
+            
+            // Make visible if set to hide when not in use
+            if (hideOnRelease) 
+            {
+                SetJoystickVisibility(true);
+            }
+            
+            OnJoystickDown?.Invoke();
+            UpdateVisuals(true);
+            
+            // Process the initial touch
+            OnDrag(eventData);
+        }
+        
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (_canvas == null || backgroundRect == null || handleRect == null)
+                return;
+            
+            // Calculate local position based on canvas scaling
+            Vector2 position = Vector2.zero;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                backgroundRect,
+                eventData.position,
+                _uiCamera,
+                out position);
+            
+            // Calculate input vector (normalized direction)
+            _inputVector = position / joystickRange;
+            
+            // Clamp magnitude to 1
+            if (_inputVector.magnitude > 1)
+                _inputVector = _inputVector.normalized;
+            
+            // Update handle position
+            UpdateHandlePosition();
+            
+            // Fire event
+            OnJoystickMove?.Invoke(_inputVector);
+        }
+        
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            _isDragging = false;
+            
+            // Reset handle position instantly or start smooth reset in Update
+            if (!snapToCenter)
+            {
+                _inputVector = Vector2.zero;
+                UpdateHandlePosition();
+            }
+            
+            // Hide joystick if set to hide when not in use
+            if (hideOnRelease) 
+            {
+                SetJoystickVisibility(false);
+            }
+            
+            OnJoystickUp?.Invoke();
+            UpdateVisuals(false);
+        }
+        
+        private void UpdateHandlePosition()
+        {
+            if (handleRect != null)
+            {
+                handleRect.anchoredPosition = _inputVector * joystickRange;
+            }
+        }
+        
+        private void UpdateVisuals(bool isActive)
+        {
+            if (!showVisualFeedback)
+                return;
+                
+            if (_backgroundImage != null)
+                _backgroundImage.color = isActive ? activeColor : normalColor;
+                
+            if (_handleImage != null)
+                _handleImage.color = isActive ? activeColor : normalColor;
+        }
+        
+        private void SetJoystickVisibility(bool visible)
+        {
+            if (_backgroundImage != null)
+                _backgroundImage.enabled = visible;
+                
+            if (_handleImage != null)
+                _handleImage.enabled = visible;
+        }
+        
+        /// <summary>
+        /// Resets the joystick to its default state
+        /// </summary>
+        public void ResetJoystick()
+        {
+            _inputVector = Vector2.zero;
+            _isDragging = false;
+            UpdateHandlePosition();
+            UpdateVisuals(false);
+            
+            // Return to original position if not fixed
+            if (!fixedPosition)
+            {
+                backgroundRect.position = _pointerDownPosition;
+            }
+            
+            // Hide if necessary
+            if (hideOnRelease)
+            {
+                SetJoystickVisibility(false);
+            }
+        }
+        
+        /// <summary>
+        /// Manually sets the joystick's input vector - useful for custom input methods
+        /// </summary>
+        public void SetInputVector(Vector2 inputVector)
+        {
+            _inputVector = inputVector.magnitude > 1 ? inputVector.normalized : inputVector;
+            UpdateHandlePosition();
+            UpdateVisuals(_inputVector.magnitude > 0.01f);
+            OnJoystickMove?.Invoke(_inputVector);
+        }
     }
 } 
