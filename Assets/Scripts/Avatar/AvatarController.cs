@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using TequilaSunrise.UI;
 
 namespace TequilaSunrise.Avatar
 {
@@ -26,7 +27,13 @@ namespace TequilaSunrise.Avatar
         [SerializeField] private LayerMask groundLayers;
         
         [Header("Mobile Controls")]
-        [SerializeField] private Joystick joystick;
+        [SerializeField] private Joystick _joystick;
+        
+        // Public property for the joystick
+        public Joystick joystick {
+            get { return _joystick; }
+            set { _joystick = value; }
+        }
         
         private int animIDSpeed;
         private int animIDGrounded;
@@ -72,8 +79,8 @@ namespace TequilaSunrise.Avatar
         
         private void HandleMovement()
         {
-            float horizontal = joystick.Horizontal;
-            float vertical = joystick.Vertical;
+            float horizontal = _joystick.Horizontal;
+            float vertical = _joystick.Vertical;
             Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
             
             if (direction.magnitude >= 0.1f)

@@ -1,68 +1,67 @@
-# Tequila Sunrise
+# TequilaSunrise
 
-AR mobile application that combines pixel art aesthetics with modern AR technology.
+AR character adventure project for mobile platforms
 
-## Features
+## Project Overview
+TequilaSunrise is an augmented reality (AR) application that allows users to place and interact with a pixelated character and motorcycle in their real environment. Built using Unity and AR Foundation, this project is designed for iOS and Android mobile devices.
 
-- AR Foundation integration for AR functionality
-- Pixel art style visual design
-- Mobile-optimized input system for AR interactions
-- Motorcycle model with physics interactions
-- Environment exploration in AR
+## Current Status
+- AR Foundation setup and configuration ✅
+- Mobile input system implementation ✅
+- Fixed compiler errors and cleaned up code structure ✅
+- Character AR test scene implementation 🔄 (In progress)
+
+## Key Features
+- AR plane detection for placing virtual objects in the real world
+- Character controller with animations and physics
+- Motorcycle riding mechanics
+- Mobile-optimized controls
 
 ## Getting Started
 
 ### Prerequisites
-
-- Unity 2022.3 LTS or later
-- AR Foundation 5.0 or later
-- iOS 13+ or Android 7.0+ device with ARKit/ARCore support
+- Unity 2022.3 or newer
+- AR Foundation package
+- iOS/Android build support modules
+- For iOS: XCode and Apple Developer account
+- For Android: Android Studio and JDK
 
 ### Installation
-
 1. Clone the repository
-```
-git clone https://github.com/username/TequilaSunrise.git
-```
-
 2. Open the project in Unity
-3. Open the ARTest scene in Assets/Scenes
-4. Build to a compatible iOS or Android device
+3. Install required packages via Package Manager
+4. Build for your target platform
 
-## Documentation
+## Project Structure
 
-- [AR Setup Guide](docs/ar/ar_setup_guide.md)
-- [Mobile Input System](docs/input/mobile_input_system.md)
-- [Build Process](docs/build/build_guide.md)
+### AR Components
+- AR Session management for tracking
+- Plane detection for placing objects
+- Raycasting for interaction
 
-## Mobile Input System
+### Character Components
+- Avatar controller with animations
+- Physics-based movement
+- Motorcycle interaction capabilities
 
-Tequila Sunrise includes a comprehensive mobile input system designed specifically for AR interactions:
+### Mobile Input
+- Virtual joystick control
+- Action buttons (jump, interact, etc.)
+- Mobile-optimized UI elements
 
-- **Virtual Joysticks**: Customizable joysticks for movement and camera control
-- **Action Buttons**: Configurable buttons for game interactions
-- **AR Integration**: Input system designed to work with AR interactions
-- **Customizable UI**: Adaptable for different screen sizes and configurations
+### Scenes
+- Main AR scene with character and motorcycle interactions
 
-To use the mobile input system:
+## Development Workflow
+- Task tracking through GitHub issues
+- Branching per task (TS-X-description)
+- Follow coding standards in AI-AGENT-GUIDELINES.md
 
-1. Open your scene in Unity
-2. Use the menu option: TequilaSunrise → UI → Create Mobile Controls
-3. Connect the controller to your gameplay scripts
-
-For detailed documentation, see the [Mobile Input System Guide](docs/input/mobile_input_system.md).
-
-## Development Status
-
-Current development focus:
-- Mobile input system for AR interactions
-- AR object placement and manipulation
-- Motorcycle model integration
+## Testing
+Test on both iOS and Android devices to ensure cross-platform compatibility.
 
 ## License
-
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Contact
-
 Project Link: [https://github.com/username/TequilaSunrise](https://github.com/username/TequilaSunrise) 

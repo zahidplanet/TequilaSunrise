@@ -1,246 +1,211 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TequilaSunrise.Avatar;
+using TequilaSunrise.UI;
 
 namespace TequilaSunrise.Motorcycle
 {
+    /// <summary>
+    /// Controls motorcycle physics and interaction with the avatar
+    /// </summary>
     public class MotorcycleController : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Rigidbody motorcycleRigidbody;
-        [SerializeField] private Transform motorcycleBody;
-        [SerializeField] private Transform frontWheel;
-        [SerializeField] private Transform rearWheel;
-        [SerializeField] private Transform handlebar;
-        [SerializeField] private Transform frontSuspension;
+        [SerializeField] private Transform riderSeatTransform;
+        [SerializeField] private ParticleSystem exhaustParticles;
+        [SerializeField] private AudioSource engineAudioSource;
         
-        [Header("Engine Settings")]
-        [SerializeField] private float enginePower = 1500f;
-        [SerializeField] private float brakeForce = 2000f;
-        [SerializeField] private float maxSpeed = 100f; // km/h
-        [SerializeField] private AnimationCurve powerCurve;
-        
-        [Header("Steering Settings")]
-        [SerializeField] private float steeringSpeed = 2.0f;
-        [SerializeField] private float maxSteeringAngle = 30f;
-        [SerializeField] private float leanAngle = 30f;
-        [SerializeField] private float counterSteeringFactor = 0.5f;
-        
-        [Header("Suspension")]
-        [SerializeField] private float suspensionHeight = 0.2f;
-        [SerializeField] private float suspensionSpringStrength = 200f;
-        [SerializeField] private float suspensionDamping = 20f;
-        [SerializeField] private float wheelRadius = 0.3f;
+        [Header("Movement Settings")]
+        [SerializeField] private float maxSpeed = 10f;
+        [SerializeField] private float acceleration = 5f;
+        [SerializeField] private float deceleration = 8f;
+        [SerializeField] private float turnSpeed = 120f;
+        [SerializeField] private float groundCheckDistance = 0.5f;
         [SerializeField] private LayerMask groundLayers;
         
-        [Header("Stability")]
-        [SerializeField] private float downforce = 100f;
-        [SerializeField] private float uprightTorque = 50f;
-        [SerializeField] private float angularDragGround = 5f;
-        [SerializeField] private float angularDragAir = 0.5f;
+        [Header("Interaction")]
+        [SerializeField] private float interactionRadius = 2.0f;
         
-        // Input values
-        private float throttleInput = 0f;
-        private float brakeInput = 0f;
-        private float steeringInput = 0f;
+        private Rigidbody _rigidbody;
+        private MobileInputController _inputController;
+        private AvatarController _currentRider;
+        private float _currentSpeed = 0f;
+        private bool _isGrounded = false;
+        private bool _isRiderMounted = false;
         
-        // Runtime variables
-        private float currentSteeringAngle = 0f;
-        private float currentLeanAngle = 0f;
-        private bool frontWheelGrounded = false;
-        private bool rearWheelGrounded = false;
+        private void Awake()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+            
+            // Configure rigidbody for motorcycle physics
+            if (_rigidbody != null)
+            {
+                _rigidbody.centerOfMass = new Vector3(0, -0.5f, 0); // Lower center of mass for stability
+                _rigidbody.constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX;
+            }
+        }
         
         private void Start()
         {
-            if (motorcycleRigidbody == null)
+            // Find the input controller in the scene if not assigned
+            if (_inputController == null)
             {
-                motorcycleRigidbody = GetComponent<Rigidbody>();
+                _inputController = FindObjectOfType<MobileInputController>();
             }
             
-            // Set physics settings
-            motorcycleRigidbody.centerOfMass = new Vector3(0, -0.2f, 0);
+            // Initialize particles and audio
+            if (exhaustParticles != null)
+            {
+                var emission = exhaustParticles.emission;
+                emission.enabled = false;
+            }
+            
+            if (engineAudioSource != null)
+            {
+                engineAudioSource.volume = 0.2f;
+                engineAudioSource.pitch = 0.5f;
+                engineAudioSource.Play();
+            }
+        }
+        
+        private void Update()
+        {
+            CheckGrounded();
+            
+            // Only process input if a rider is mounted
+            if (_isRiderMounted && _inputController != null)
+            {
+                HandleMovementInput();
+                UpdateEffects();
+            }
+            else
+            {
+                // Slow down if no rider
+                _currentSpeed = Mathf.Lerp(_currentSpeed, 0, Time.deltaTime * deceleration);
+            }
         }
         
         private void FixedUpdate()
         {
-            ApplyDownforce();
-            CheckWheelsGrounded();
-            UpdateSuspension();
-            UpdateStabilizers();
-            
-            HandleSteering();
-            ApplyMotorTorque();
-            ApplyBraking();
-            ApplyLean();
-            
-            UpdateWheelMeshes();
-        }
-        
-        public void SetInputs(float throttle, float brake, float steering)
-        {
-            throttleInput = Mathf.Clamp01(throttle);
-            brakeInput = Mathf.Clamp01(brake);
-            steeringInput = Mathf.Clamp(steering, -1f, 1f);
-        }
-        
-        private void HandleSteering()
-        {
-            // Apply counter-steering at higher speeds
-            float normalizedSpeed = motorcycleRigidbody.linearVelocity.magnitude / maxSpeed;
-            float targetAngle = steeringInput * maxSteeringAngle;
-            
-            // Reduce steering angle at higher speeds
-            targetAngle *= Mathf.Lerp(1.0f, 0.5f, normalizedSpeed);
-            
-            // Smoothly interpolate current steering angle
-            currentSteeringAngle = Mathf.Lerp(currentSteeringAngle, targetAngle, Time.fixedDeltaTime * steeringSpeed);
-            
-            // Apply steering to handlebar and front wheel
-            if (handlebar != null)
+            // Apply motorcycle physics
+            if (_isGrounded)
             {
-                handlebar.localRotation = Quaternion.Euler(0, currentSteeringAngle, 0);
-            }
-            
-            // Apply steering force
-            if (frontWheelGrounded)
-            {
-                Vector3 steeringDir = Quaternion.Euler(0, currentSteeringAngle, 0) * transform.forward;
-                float steeringForce = Mathf.Lerp(20f, 5f, normalizedSpeed);
-                motorcycleRigidbody.AddForce(steeringDir * steeringForce, ForceMode.Acceleration);
+                // Move forward based on current speed
+                Vector3 moveDirection = transform.forward * _currentSpeed;
+                _rigidbody.velocity = new Vector3(moveDirection.x, _rigidbody.velocity.y, moveDirection.z);
             }
         }
         
-        private void ApplyMotorTorque()
+        private void CheckGrounded()
         {
-            // Calculate current speed in km/h
-            float speed = motorcycleRigidbody.linearVelocity.magnitude * 3.6f; // Convert to km/h
+            RaycastHit hit;
+            Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
+            _isGrounded = Physics.Raycast(rayOrigin, Vector3.down, out hit, groundCheckDistance, groundLayers);
+        }
+        
+        private void HandleMovementInput()
+        {
+            // Get input from the mobile input controller
+            Vector2 movement = _inputController.MovementInput;
             
-            // Apply motor torque to rear wheel
-            if (speed < maxSpeed)
+            // Accelerate/decelerate based on vertical input
+            float targetSpeed = movement.y * maxSpeed;
+            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed,
+                (targetSpeed > _currentSpeed ? acceleration : deceleration) * Time.deltaTime);
+            
+            // Turn based on horizontal input
+            if (Mathf.Abs(_currentSpeed) > 0.5f)
             {
-                // Get power based on current speed
-                float normalizedSpeed = speed / maxSpeed;
-                float powerFactor = powerCurve.Evaluate(normalizedSpeed);
+                float turnAmount = movement.x * turnSpeed * Time.deltaTime;
+                transform.Rotate(0, turnAmount, 0);
+            }
+        }
+        
+        private void UpdateEffects()
+        {
+            if (exhaustParticles != null)
+            {
+                var emission = exhaustParticles.emission;
+                emission.enabled = Mathf.Abs(_currentSpeed) > 1.0f;
                 
-                // Calculate forward force
-                Vector3 forwardForce = transform.forward * enginePower * throttleInput * powerFactor;
+                // Adjust emission rate based on speed
+                var rate = emission.rateOverTime;
+                rate.constant = Mathf.Abs(_currentSpeed) * 5f;
+            }
+            
+            if (engineAudioSource != null)
+            {
+                // Adjust engine sound based on speed
+                float targetPitch = 0.5f + (Mathf.Abs(_currentSpeed) / maxSpeed) * 1.0f;
+                engineAudioSource.pitch = Mathf.Lerp(engineAudioSource.pitch, targetPitch, Time.deltaTime * 2f);
                 
-                // Only apply if rear wheel is grounded
-                if (rearWheelGrounded)
-                {
-                    motorcycleRigidbody.AddForce(forwardForce, ForceMode.Force);
-                }
-            }
-            
-            // Spin wheels for visual effect
-            if (rearWheel != null)
-            {
-                rearWheel.Rotate(Vector3.right, motorcycleRigidbody.linearVelocity.magnitude * Time.fixedDeltaTime * 40f, Space.Self);
+                float targetVolume = 0.2f + (Mathf.Abs(_currentSpeed) / maxSpeed) * 0.5f;
+                engineAudioSource.volume = Mathf.Lerp(engineAudioSource.volume, targetVolume, Time.deltaTime * 2f);
             }
         }
         
-        private void ApplyBraking()
+        /// <summary>
+        /// Check if the avatar can interact with this motorcycle
+        /// </summary>
+        public bool CanInteractWith(Transform avatarTransform)
         {
-            if (brakeInput > 0.1f && motorcycleRigidbody.linearVelocity.magnitude > 0.1f)
-            {
-                // Calculate brake force in the opposite direction of travel
-                Vector3 brakeForceVector = -motorcycleRigidbody.linearVelocity.normalized * brakeForce * brakeInput;
+            if (avatarTransform == null)
+                return false;
                 
-                // Apply brake force when wheels are grounded
-                if (frontWheelGrounded || rearWheelGrounded)
-                {
-                    motorcycleRigidbody.AddForce(brakeForceVector, ForceMode.Force);
-                }
-            }
+            float distance = Vector3.Distance(transform.position, avatarTransform.position);
+            return distance <= interactionRadius;
         }
         
-        private void ApplyLean()
+        /// <summary>
+        /// Mount the rider on the motorcycle
+        /// </summary>
+        public void MountRider(AvatarController avatarController)
         {
-            // Calculate lean based on steering and speed
-            float speed = motorcycleRigidbody.linearVelocity.magnitude;
-            float targetLean = -steeringInput * leanAngle * (speed / maxSpeed);
-            
-            // Apply lean to motorcycle body
-            if (motorcycleBody != null)
-            {
-                currentLeanAngle = Mathf.Lerp(currentLeanAngle, targetLean, Time.fixedDeltaTime * 2.0f);
-                motorcycleBody.localRotation = Quaternion.Euler(0, 0, currentLeanAngle);
-            }
-        }
-        
-        private void ApplyDownforce()
-        {
-            // Apply downforce to keep motorcycle grounded
-            motorcycleRigidbody.AddForce(-transform.up * downforce * motorcycleRigidbody.linearVelocity.magnitude);
-        }
-        
-        private void UpdateWheelMeshes()
-        {
-            if (frontWheel != null)
-            {
-                frontWheel.Rotate(Vector3.right, motorcycleRigidbody.linearVelocity.magnitude * Time.fixedDeltaTime * 40f, Space.Self);
-            }
-        }
-        
-        private void CheckWheelsGrounded()
-        {
-            // Front wheel ground check
-            if (frontWheel != null)
-            {
-                frontWheelGrounded = Physics.CheckSphere(frontWheel.position - new Vector3(0, wheelRadius, 0), 
-                                                      wheelRadius, groundLayers, QueryTriggerInteraction.Ignore);
-            }
-            
-            // Rear wheel ground check
-            if (rearWheel != null)
-            {
-                rearWheelGrounded = Physics.CheckSphere(rearWheel.position - new Vector3(0, wheelRadius, 0),
-                                                      wheelRadius, groundLayers, QueryTriggerInteraction.Ignore);
-            }
-            
-            // Set angular drag based on grounding
-            motorcycleRigidbody.angularDrag = (frontWheelGrounded || rearWheelGrounded) ? angularDragGround : angularDragAir;
-        }
-        
-        private void UpdateSuspension()
-        {
-            // Simple suspension for front wheel
-            if (frontWheel != null && frontSuspension != null)
-            {
-                RaycastHit hit;
-                Vector3 rayStart = frontWheel.position + Vector3.up * 0.1f;
+            if (avatarController == null || _isRiderMounted)
+                return;
                 
-                if (Physics.Raycast(rayStart, Vector3.down, out hit, suspensionHeight + 0.1f, groundLayers, QueryTriggerInteraction.Ignore))
-                {
-                    float suspensionTravel = suspensionHeight - (hit.distance - 0.1f);
-                    frontSuspension.localPosition = new Vector3(0, -suspensionTravel * 0.5f, 0);
-                }
-                else
-                {
-                    frontSuspension.localPosition = Vector3.zero;
-                }
-            }
-        }
-        
-        private void UpdateStabilizers()
-        {
-            // Apply auto-upright torque based on current tilt
-            Vector3 currentUp = transform.up;
-            Vector3 worldUp = Vector3.up;
+            _currentRider = avatarController;
+            _isRiderMounted = true;
             
-            // Calculate the torque needed to align with world up
-            Vector3 torqueDirection = Vector3.Cross(currentUp, worldUp);
-            
-            // Only apply when grounded and not intentionally leaning
-            if ((frontWheelGrounded || rearWheelGrounded) && Mathf.Abs(steeringInput) < 0.1f)
+            // Position the rider on the motorcycle
+            if (riderSeatTransform != null)
             {
-                motorcycleRigidbody.AddTorque(torqueDirection * uprightTorque, ForceMode.Acceleration);
+                avatarController.OnMotorcycleMount(riderSeatTransform);
+            }
+            else
+            {
+                avatarController.OnMotorcycleMount(transform);
+            }
+            
+            // Start engine sound
+            if (engineAudioSource != null)
+            {
+                engineAudioSource.volume = 0.4f;
+                engineAudioSource.pitch = 0.7f;
             }
         }
         
-        public float GetSpeed()
+        /// <summary>
+        /// Dismount the rider from the motorcycle
+        /// </summary>
+        public void DismountRider()
         {
-            return motorcycleRigidbody.linearVelocity.magnitude * 3.6f; // Return speed in km/h
+            if (_currentRider == null || !_isRiderMounted)
+                return;
+                
+            // Position the rider next to the motorcycle
+            _currentRider.OnMotorcycleDismount();
+            
+            _currentRider = null;
+            _isRiderMounted = false;
+            
+            // Idle engine sound
+            if (engineAudioSource != null)
+            {
+                engineAudioSource.volume = 0.2f;
+                engineAudioSource.pitch = 0.5f;
+            }
         }
     }
 } 
